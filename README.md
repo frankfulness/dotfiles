@@ -12,3 +12,5 @@ Simplicity is key, and I value aesthetics.
 [lazyvim](https://www.lazyvim.org/) - neovim setup
 
 [zellij](https://zellij.dev/) - terminal multiplexer + more
+
+[bat](https://github.com/sharkdp/bat) - cat(1) clone with wings
