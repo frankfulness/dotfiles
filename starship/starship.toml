@@ -1,187 +1,68 @@
+# Get editor completions based on the config schema
 "$schema" = 'https://starship.rs/config-schema.json'
 
-format = """
-$os\
-$all\
-$character\
-"""
+# Inserts a blank line between shell prompts
+add_newline = true
 
+# Replace the '❯' symbol in the prompt with '➜'
+[character] # The name of the module we are configuring is 'character'
+success_symbol = '[➜](bold green)' # The 'success_symbol' segment is being set to '➜' with the color 'bold green'
+
+# Disable the package module, hiding it from the prompt completely
 [aws]
-symbol = ""
-format = "on [$symbol($profile )(\\($region\\) )(\\[$duration\\] )]($style)"
-disabled = true
-style = "bold yellow"
-
-[buf]
-symbol = " "
-
-[c]
-symbol = " "
-
-[conda]
-symbol = " "
-
-[character]
-success_symbol = "[\uf054_](bold fg:#eaeaea)"
-error_symbol = "[\uf054_](bold fg:#d54e53)"
-format = "$symbol "
-
-[dart]
-symbol = " "
-
-[directory]
-home_symbol = "\uf015"
-read_only = " 󰌾"
-format = "[$path]($style)[$read_only]($read_only_style) "
-style = "fg:#c397d8 bold"
-
-[docker_context]
-symbol = " "
 disabled = true
 
+# Wait 10 milliseconds for starship to check files under the current directory
+scan_timeout = 10
 
-[elixir]
-symbol = " "
-
-[elm]
-symbol = " "
-
-[fossil_branch]
-symbol = " "
-
-[git_branch]
-symbol = " "
-format = "on [$symbol$branch(:$remote_branch)]($style) "
-style = "fg:#c397d8 bold"
-
-[git_status]
-format = "([\\[$all_status$ahead_behind\\]]($style) )"
-style = "fg:#7aa6da bold"
-ahead = "⇡"
-behind = "⇣"
-conflicted = "="
-deleted = "✘"
-diverged = "⇕"
-modified = "!"
-renamed = "»"
-staged = "+"
-stashed = "\\$"
-untracked = "?"
-
-[gcloud]
-disabled = true
-
-[golang]
-format = "[$symbol($version )]($style)"
-symbol = " "
-
-[guix_shell]
-symbol = " "
-
-[haskell]
-symbol = " "
-
-[haxe]
-symbol = "⌘ "
-
-[hg_branch]
-symbol = " "
-
-[hostname]
-ssh_symbol = " "
-
-[java]
-symbol = " "
-
-[julia]
-symbol = " "
-
-[lua]
-symbol = " "
-
-[memory_usage]
-symbol = "󰍛 "
-
-[meson]
-symbol = "󰔷 "
-
-[nim]
-symbol = "󰆥 "
-
-[nix_shell]
-symbol = " "
-
-[nodejs]
-format = "[$symbol($version )]($style)"
-symbol = " "
-
-[os]
+[line_break]
 disabled = false
 
-[os.symbols]
-Alpaquita = " "
-Alpine = " "
-Amazon = " "
-Android = " "
-Arch = " "
-Artix = " "
-CentOS = " "
-Debian = " "
-DragonFly = " "
-Emscripten = " "
-EndeavourOS = " "
-Fedora = " "
-FreeBSD = " "
-Garuda = "󰛓 "
-Gentoo = " "
-HardenedBSD = "󰞌 "
-Illumos = "󰈸 "
-Linux = " "
-Mabox = " "
-Macos = " "
-Manjaro = " "
-Mariner = " "
-MidnightBSD = " "
-Mint = " "
-NetBSD = " "
-NixOS = " "
-OpenBSD = "󰈺 "
-openSUSE = " "
-OracleLinux = "󰌷 "
-Pop = " "
-Raspbian = " "
-Redhat = " "
-RedHatEnterprise = " "
-Redox = "󰀘 "
-Solus = "󰠳 "
-SUSE = " "
-Ubuntu = " "
-Unknown = " "
-Windows = "󰍲 "
+[directory]
+truncation_length = 3
+read_only = "🔒"
 
-[package]
-symbol = "󰏗 "
-disabled = true
+[git_branch]
+symbol = " "
 
-[pijul_channel]
-symbol = "🪺 "
+[git_commit]
+commit_hash_length = 7
+format = "on [$hash]($style) "
+tag_symbol = " 🏷  "
+
+[git_status]
+ahead = "⇡${count}"
+diverged = "⬆️${ahead_count}⬇️${behind_count}"
+behind = "⇣"
+
+[git_state]
+format = '[\($state( $progress_current of $progress_total)\)]($style) '
+cherry_pick = "[🍒 PICKING](bold red)"
+
+[git_metrics]
+disabled = false
+added_style = "bold blue"
+format = "[+$added]($added_style)/[-$deleted]($deleted_style) "
+
+[hg_branch]
+symbol = " "
+
+[nodejs]
+format = "via [NodeJS $version](bold green)"
+
+[golang]
+format = "via [Go $version](bold red)"
 
 [python]
-symbol = " "
+format = "via [${symbol}${pyenv_prefix}(${version} )(\\($virtualenv\\) )](bold yellow)"
 
-[rlang]
-symbol = "󰟔 "
+[lua]
+format = "via [Lua $version](bold blue)"
 
-[ruby]
-symbol = " "
+[direnv]
+disabled = false
 
-[rust]
-symbol = "🦀 "
-version_format = "v${raw}"
-format = "[$symbol($version )]($style)"
-
-[scala]
-symbol = " "
-
-[spack]
-symbol = "🅢 "
+[sudo]
+style = "bold green"
+symbol = "🧙 "
+disabled = false
