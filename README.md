@@ -3,6 +3,8 @@
 > My philosophy is to customize my dev env to continually prioritize velocity, discoverability, intelligence, & extensibility.
 Simplicity is key, and I value aesthetics.
 
+<img src="./assets/books.jpg" />
+
 [warp](https://www.warp.dev/) - terminal emulator + ai
 
 [starship](https://starship.rs/) - shell prompt
