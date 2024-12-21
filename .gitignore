@@ -1,0 +1,24 @@
+# Node
+npm-debug.log
+/node_modules
+
+# Mac
+.DS_Store
+
+# vi
+*~
+
+# General
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+log/
+*.log
+*.dump
+
+# Testing
+/coverage
+
+# Parcel or Webpack
+dist/
+public/
