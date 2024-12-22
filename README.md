@@ -1,9 +1,9 @@
-# dotfiles
+# 📂 dotfiles
 
 > My philosophy is to customize my dev env to continually prioritize velocity, discoverability, intelligence, & extensibility.
 Simplicity is key, and I value aesthetics.
 
-<img src="./assets/books.jpg" />
+<img src="./assets/books.jpg" alt="Ireland Dublin Trinity College Ancient Library image of book isles full of ancient books with ceramic busts of men at every endcap." />
 
 [warp](https://www.warp.dev/) - terminal emulator + ai
 
