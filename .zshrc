@@ -11,15 +11,30 @@ source $ZSH/oh-my-zsh.sh
 export GOPATH=$HOME/go # in home dir create dir called go and where everything is gonna go in there.
 export PATH=$PATH:$GOPATH/bin # Adding to my path and path is stuff I can run from my term and concatinating in go/bin all in my path to be useable
 
-# Example aliases
+# Aliases
+
+# Machine / Terminal
 alias n="nvim"
 alias zj="zellij"
 alias eng="cd Desktop/Engineering"
+
+# Git
 alias g="git"
 alias gs="git status"
 alias ga="git add ."
-alias zrc="code ~/.zshrc"
-alias szrc="source ~/.zshrc"
+alias gm="git commit -m "
+alias gp="git push"
+alias gpl="git pull"
+alias gr="git rebase -i dev"
+
+# Zsh/Bash
+alias zshrc="n ~/.zshrc"
+alias srczsh="source ~/.zshrc"
+
+# Terraform
+alias tfi="terraform init"
+alias tfa="terraform apply"
+alias tfp="terraform plan"
 
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
