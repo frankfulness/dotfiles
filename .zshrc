@@ -25,16 +25,25 @@ alias ga="git add ."
 alias gm="git commit -m "
 alias gp="git push"
 alias gpl="git pull"
+alias glog="git log --oneline"
 alias gr="git rebase -i dev"
+alias grs="git reset --soft HEAD~1"
+alias grh="git reset --hard HEAD~1"
 
 # Zsh/Bash
 alias zshrc="n ~/.zshrc"
 alias srczsh="source ~/.zshrc"
 
 # Terraform
+alias tf="terraform"
 alias tfi="terraform init"
 alias tfa="terraform apply"
 alias tfp="terraform plan"
+alias tfc="terraform console"
+alias tfd="terraform destroy"
+alias tff="terraform fmt"
+alias tfg="terraform graph"
+alias tfim="terraform import"
 
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
