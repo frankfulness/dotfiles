@@ -16,3 +16,5 @@ Simplicity is key, and I value aesthetics.
 [zellij](https://zellij.dev/) - terminal multiplexer + more
 
 [bat](https://github.com/sharkdp/bat) - cat(1) clone with wings
+
+[typora](https://typora.io/) - simple markdown inline editor for note system
