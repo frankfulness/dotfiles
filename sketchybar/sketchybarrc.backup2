@@ -1,0 +1,80 @@
+# Modern Sketchybar config with Aerospace integration
+# Shows only active aerospace workspaces with app icons
+
+PLUGIN_DIR="$CONFIG_DIR/plugins"
+
+##### Bar Appearance #####
+sketchybar --bar position=top height=40 blur_radius=30 color=0x20000000 margin=8
+
+##### Changing Defaults #####
+default=(
+  padding_left=4
+  padding_right=4
+  icon.font="SF Pro Display:Bold:16.0"
+  label.font="SF Pro Display:Medium:13.0"
+  icon.color=0xffffffff
+  label.color=0xffffffff
+  background.border_width=0
+  background.corner_radius=8
+  background.height=32
+)
+sketchybar --default "${default[@]}"
+
+##### Adding Dynamic Aerospace Workspaces #####
+# This will be populated by the aerospace_workspaces.sh script
+# Only shows workspaces that actually have windows
+
+##### Adding Left Items #####
+# Separator and current app
+sketchybar --add item separator left \
+           --set separator icon="󰿟" \
+                          icon.color=0xff9ca0a4 \
+                          icon.padding_left=8 \
+                          icon.padding_right=8 \
+                          label.drawing=off \
+           --add item front_app left \
+           --set front_app icon.drawing=off \
+                          script="$PLUGIN_DIR/front_app.sh" \
+                          label.font="SF Pro Display:Semibold:13.0" \
+           --subscribe front_app front_app_switched
+
+##### Adding Right Items #####
+# Modern right-side items with proper icons
+
+# Dato (Date/Time)
+sketchybar --add item dato right \
+           --set dato update_freq=30 \
+                     icon="󰸗" \
+                     icon.color=0xff9ca0a4 \
+                     icon.padding_right=8 \
+                     script="$PLUGIN_DIR/dato.sh" \
+
+# Volume
+sketchybar --add item volume right \
+           --set volume script="$PLUGIN_DIR/volume.sh" \
+                       icon.color=0xff9ca0a4 \
+                       icon.padding_right=8 \
+           --subscribe volume volume_change \
+
+# Battery
+sketchybar --add item battery right \
+           --set battery update_freq=120 \
+                        script="$PLUGIN_DIR/battery.sh" \
+                        icon.color=0xff9ca0a4 \
+                        icon.padding_right=8 \
+           --subscribe battery system_woke power_source_change
+
+##### Initialization #####
+# Run the aerospace workspace script to populate workspaces
+sketchybar --add event aerospace_workspace_change \
+           --add item aerospace_trigger left \
+           --set aerospace_trigger script="$PLUGIN_DIR/aerospace_workspaces.sh" \
+                                   label.drawing=off \
+                                   icon.drawing=off \
+           --subscribe aerospace_trigger aerospace_workspace_change
+
+# Initial population of workspaces
+"$PLUGIN_DIR/aerospace_workspaces.sh"
+
+##### Force all scripts to run #####
+sketchybar --update

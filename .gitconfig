@@ -1,0 +1,8 @@
+[user]
+	name = Frankfulness
+	email = Fullstackfrank@gmail.com
+	signingkey = B774CC49DD110EDE
+[commit]
+	gpgsign = true
+[tag]
+	gpgsign = true

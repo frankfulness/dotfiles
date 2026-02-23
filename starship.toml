@@ -1,0 +1,32 @@
+# Minimal prompt similar to Warp's clean look
+format = """
+$directory$git_branch$git_status $fill $time
+$character"""
+
+[fill]
+symbol = " "
+
+[directory]
+style = "bold cyan"
+truncation_length = 4
+truncate_to_repo = false
+format = "[$path]($style) "
+
+[git_branch]
+symbol = ""
+style = "bold purple"
+format = "[$symbol$branch]($style) "
+
+[git_status]
+format = '([$all_status$ahead_behind]($style) )'
+style = "bold red"
+
+[time]
+disabled = false
+format = "[$time]($style)"
+style = "dimmed white"
+time_format = "%I:%M:%S %p"
+
+[character]
+success_symbol = "[❯](bold green)"
+error_symbol = "[❯](bold red)"

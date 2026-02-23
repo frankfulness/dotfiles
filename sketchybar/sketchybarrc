@@ -1,0 +1,127 @@
+#!/bin/bash
+
+# Ensure CONFIG_DIR is set
+CONFIG_DIR="${CONFIG_DIR:-$HOME/.config/sketchybar}"
+export CONFIG_DIR
+
+source "$CONFIG_DIR/colors.sh" # Loads all defined colors
+source "$CONFIG_DIR/icons.sh" # Loads all defined icons
+
+ITEM_DIR="$CONFIG_DIR/items" # Directory where the items are configured
+PLUGIN_DIR="$CONFIG_DIR/plugins" # Directory where all the plugin scripts are stored
+
+FONT="0xProto Nerd Font Mono" # Match user's preferred font
+PADDINGS=3 # All paddings use this value (icon, label, background)
+
+# Unload the macOS on screen indicator overlay for volume change
+launchctl unload -F /System/Library/LaunchAgents/com.apple.OSDUIHelper.plist > /dev/null 2>&1 &
+
+# Setting up the general bar appearance of the bar
+bar=(
+  height=39
+  color=$BAR_COLOR
+  shadow=on
+  position=top
+  sticky=on
+  padding_right=10
+  padding_left=10
+  corner_radius=9
+  y_offset=10
+  margin=10
+  blur_radius=20
+  notch_width=0
+)
+
+sketchybar --bar "${bar[@]}"
+
+# Setting up default values
+defaults=(
+  updates=when_shown
+  icon.font="$FONT:Bold:16.0"
+  icon.color=$ICON_COLOR
+  icon.padding_left=8
+  icon.padding_right=4
+  label.font="$FONT:Bold:15.0"
+  label.color=$LABEL_COLOR
+  label.padding_left=4
+  label.padding_right=8
+  padding_right=8
+  padding_left=8
+  background.height=30
+  background.corner_radius=9
+  popup.background.border_width=2
+  popup.background.corner_radius=9
+  popup.background.border_color=$POPUP_BORDER_COLOR
+  popup.background.color=$POPUP_BACKGROUND_COLOR
+  popup.blur_radius=20
+  popup.background.shadow.drawing=on
+)
+
+sketchybar --default "${defaults[@]}"
+
+# Create aerospace workspace events
+sketchybar --add event aerospace_workspace_change
+sketchybar --add event window_focus
+sketchybar --add event space_change
+
+# Left: Apple + Aerospace workspaces + Current App
+source "$ITEM_DIR/apple.sh"
+
+# Pre-create all workspace items for smooth updates (no add/remove cycle)
+for i in {1..9}; do
+  sketchybar --add space aerospace.workspace.$i left \
+             --set aerospace.workspace.$i associated_display=1 \
+             --set aerospace.workspace.$i icon.padding_left=8 \
+             --set aerospace.workspace.$i icon.padding_right=4 \
+             --set aerospace.workspace.$i icon.font="sketchybar-app-font:Regular:16.0" \
+             --set aerospace.workspace.$i label.padding_left=4 \
+             --set aerospace.workspace.$i label.padding_right=8 \
+             --set aerospace.workspace.$i label.font="SF Pro:Semibold:13.0" \
+             --set aerospace.workspace.$i background.border_width=0 \
+             --set aerospace.workspace.$i background.corner_radius=8 \
+             --set aerospace.workspace.$i background.height=28 \
+             --set aerospace.workspace.$i background.drawing=on \
+             --set aerospace.workspace.$i click_script="aerospace workspace $i &" \
+             --set aerospace.workspace.$i drawing=off
+done
+
+# Now run aerospace.sh to set initial state
+source "$ITEM_DIR/aerospace.sh"
+
+# Add current app right after aerospace workspaces
+sketchybar --add item front_app left \
+           --set front_app background.color=$BACKGROUND_2  \
+           --set front_app icon.color=$BLUE               \
+           --set front_app icon.font="sketchybar-app-font:Regular:16.0" \
+           --set front_app label.color=0xffffffff            \
+           --set front_app label.font="0xProto Nerd Font Mono:Bold:15.0" \
+           --set front_app script="$PLUGIN_DIR/front_app.sh"            \
+           --subscribe front_app front_app_switched
+
+# Center: Spotify popup player
+source "$ITEM_DIR/spotify.sh"
+
+# Subscribe to Spotify events
+sketchybar --trigger spotify_change
+
+# Right: System indicators and Dato
+source "$ITEM_DIR/recording.sh"
+source "$ITEM_DIR/mic.sh"
+source "$ITEM_DIR/calendar.sh"
+source "$ITEM_DIR/battery.sh"
+
+# Event listener for aerospace changes
+# aerospace_workspace_change → fast path (color swap via env vars from exec-on-workspace-change)
+# front_app_switched         → full path (icon refresh when apps open/close/move)
+sketchybar --add item aerospace_listener left \
+           --set aerospace_listener script="$CONFIG_DIR/items/aerospace.sh" \
+           --set aerospace_listener icon.drawing=off \
+           --set aerospace_listener label.drawing=off \
+           --set aerospace_listener background.drawing=off \
+           --set aerospace_listener width=0 \
+           --subscribe aerospace_listener aerospace_workspace_change front_app_switched
+
+# Forcing all item scripts to run (never do this outside of sketchybarrc)
+sketchybar --update
+
+echo "sketchybar configuration loaded.."

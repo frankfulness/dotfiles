@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# JankyBorders configuration for smooth window borders
+# https://github.com/FelixKratz/JankyBorders
+
+borders active_color=0xffffffff inactive_color=0x00000000 width=5.0 style=round
