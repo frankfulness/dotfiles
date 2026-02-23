@@ -1,7 +1,7 @@
 # 📂 Dotfiles
 
 > The philosophy is to continually prioritize velocity, discoverability, intelligence, & extensibility.
-Simplicity is key, and I value clean aesthetics.
+> Simplicity is key, and I value clean aesthetics.
 
 <img src="./assets/books.jpg" alt="Ireland Dublin Trinity College Ancient Library image of book isles full of ancient books with ceramic busts of men at every endcap." />
 
@@ -32,6 +32,7 @@ cd ~/.config/dotfiles
 ```
 
 The script will:
+
 1. Install Homebrew (if needed)
 2. Install all packages from the Brewfile
 3. Symlink all configs to the correct locations
@@ -74,6 +75,7 @@ brew bundle dump --file=~/.config/dotfiles/Brewfile --force
 ## Third-Party Apps (Non-Default macOS)
 
 ### Productivity & Utilities
+
 - Amphetamine
 - Clipy (Smooth clipboard management)
 - Dato (Favorite Calendar/Date/Time MacOS Replacement)
@@ -88,6 +90,7 @@ brew bundle dump --file=~/.config/dotfiles/Brewfile --force
 - Theine (Keep machine awake)
 
 ### Development
+
 - Bruno (API Testing)
 - Cursor Pro (for recording)
 - Docker (Podman too, Containerization)
@@ -99,6 +102,7 @@ brew bundle dump --file=~/.config/dotfiles/Brewfile --force
 - Xcode
 
 ### Design & Creative
+
 - Affinity Designer 2
 - Affinity Photo 2
 - Affinity Publisher 2
@@ -107,6 +111,7 @@ brew bundle dump --file=~/.config/dotfiles/Brewfile --force
 - OBS (Streaming)
 
 ### Writing & Notes
+
 - Notion (Public facing notes tool)
 - Obsidian (Internal facing 2nd Brain)
 - Scapple (Real writing)
@@ -114,6 +119,7 @@ brew bundle dump --file=~/.config/dotfiles/Brewfile --force
 - Typora (Quick markdown notes, kinda redundant)
 
 ### Browsers
+
 - Firefox (Default, but switching to Zen slowly)
 - Firefox Developer Edition
 - Google Chrome
@@ -121,6 +127,7 @@ brew bundle dump --file=~/.config/dotfiles/Brewfile --force
 - Zen
 
 ### Communication
+
 - Claude (AI)
 - Microsoft Outlook
 - Microsoft Teams
@@ -128,6 +135,7 @@ brew bundle dump --file=~/.config/dotfiles/Brewfile --force
 - Zoom
 
 ### Corp Sellout
+
 - Microsoft Excel
 - Microsoft OneNote
 - Microsoft PowerPoint
@@ -135,11 +143,13 @@ brew bundle dump --file=~/.config/dotfiles/Brewfile --force
 - OneDrive
 
 ### Mail, Cloud & Security
+
 - Proton Drive
 - Proton Mail
 - ProtonVPN
 
 ### CLI
+
 - awscli
 - bash
 - bat
@@ -166,9 +176,12 @@ brew bundle dump --file=~/.config/dotfiles/Brewfile --force
 - zsh
 
 ### Other
+
 - Advantage 360 SmartSet App (My Kinesis Ergo Keyboard)
 - BambuStudio (Our family Bambu P2S 3D Printer)
 - Lumary (Professional Recording)
 - Raspberry Pi Imager
 - Shure (MV7+ Motiv Mix Microphone)
 - Spotify (Music)
+
+There is likely to be different updates coming.
