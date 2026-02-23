@@ -1,10 +1,6 @@
 # macOS
 .DS_Store
 
-# Large files
-*.png
-*.jpg
-*.jpeg
 
 # Secrets (if any slip in)
 *.pem

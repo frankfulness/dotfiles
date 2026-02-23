@@ -3,7 +3,7 @@
 > The philosophy is to continually prioritize velocity, discoverability, intelligence, & extensibility.
 > Simplicity is key, and I value clean aesthetics.
 
-<img src="./assets/books.jpg" alt="Ireland Dublin Trinity College Ancient Library image of book isles full of ancient books with ceramic busts of men at every endcap." />
+<img src="./images/books.jpg" alt="Ireland Dublin Trinity College Ancient Library image of book isles full of ancient books with ceramic busts of men at every endcap." />
 
 My macOS development environment configuration.
 
