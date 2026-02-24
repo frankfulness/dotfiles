@@ -251,37 +251,97 @@ bindkey -e
 # ║                                                                           ║
 # ╚═══════════════════════════════════════════════════════════════════════════╝
 
-# ── NEOVIM KEYBINDS (opens markdown file) ─────────────────────
+# ── FAQ: all aliases at a glance (run first!) ─────────────────
+function faq() {
+cat <<'CHEAT'
+╭──────────────────────────────────────────────────────────╮
+│              ALL MY ALIASES  (quick ref)                 │
+╰──────────────────────────────────────────────────────────╯
+
+📁 NAVIGATION
+   p/sb/tech/learn/ops/godev/work/agi/myblog
+
+🔧 SHELL
+   zshrc/src/c/q/btw/tr/up/up2/up3/conf
+
+🔀 GIT
+   g/gs/ga/gm/gp/gpl/glog/gr/grs/grh/stash/apply
+
+🐹 GO
+   grun/gv/gver
+
+🏗️  TERRAFORM
+   tf/tfi/tfa/tfp/tfc/tfd/tff/tfg/tfim
+
+🐍 PYTHON
+   ve/va/vq
+
+🖥️  MACOS / WINDOW MGMT
+   as/asw/asfloat/astile/rsa/togglemenu/showsketchy/showmac
+   jankyon/jankyoff/qf
+
+🤖 AI
+   ai/aii/aiq (OpenCode)
+   cc/cco/ccs/ccr/ccl/cc-portal/cc-backend/ccp/ccp-fe/ccp-be
+
+📝 CHEATSHEETS
+   faq     = this list (all aliases)
+   nv      = neovim essentials (files, search, harpoon, LSP)
+   vm      = vim motions & editing
+   as      = aerospace window management
+   nvkeys  = open full keybinds in nvim
+CHEAT
+}
+
+# ── NEOVIM ESSENTIALS (combined practical reference) ──────────
 alias nvkeys="nvim ~/.config/nvim/KEYBINDS.md"
 
-# ── AEROSPACE CHEATSHEET ──────────────────────────────────────
-alias as='echo "
-╭─────────────────────────────────────────╮
-│           AeroSpace Cheatsheet          │
-╰─────────────────────────────────────────╯
+function nv() {
+cat <<'CHEAT'
+╭──────────────────────────────────────────────────────────╮
+│  NEOVIM ESSENTIALS  (SPACE = leader)                    │
+│  Tip: press SPACE and wait for which-key!               │
+╰──────────────────────────────────────────────────────────╯
 
-🧭 Focus (navigate between windows):
-   alt-h/j/k/l       →  focus left/down/up/right
+📂 FILES (Neo-tree)
+   SPACE e         →  toggle file explorer
+   a / d / r       →  create / delete / rename (in tree)
+   H               →  toggle hidden files
 
-📦 Move windows:
-   alt-shift-h/j/k/l →  move left/down/up/right
+📑 BUFFERS & WINDOWS
+   SHIFT-h/l       →  prev / next buffer
+   SPACE b d       →  close buffer
+   CTRL-h/j/k/l    →  navigate windows
+   SPACE w s/v     →  split horizontal / vertical
 
-🔧 Resize mode:
-   alt-r             →  enter resize mode
-     h/j/k/l         →  resize left/down/up/right
-     escape          →  exit resize mode
+🔍 SEARCH (Telescope)
+   SPACE SPACE     →  find files
+   SPACE s g       →  grep across project
+   SPACE s w       →  search word under cursor
+   SPACE f r       →  recent files
+   SPACE f b       →  find buffers
+   CTRL-j/k        →  navigate results, ENTER to open
 
-❌ Quit window:
-   cmd-q             →  close window
+📌 HARPOON (quick file switching)
+   SPACE a         →  add file to harpoon
+   CTRL-e          →  open harpoon menu
+   SPACE h 1-4     →  jump to harpoon file 1-4
+   CTRL-p/n        →  prev / next harpoon file
 
-🖥️  Workspaces:
-   alt-1/2/3         →  switch to workspace
-   alt-shift-1/2/3   →  move window to workspace
+💡 LSP
+   K               →  hover docs
+   gd / gr         →  go to definition / references
+   SPACE c a       →  code actions
+   SPACE c r       →  rename symbol
+   SPACE c f       →  format
+   [ d / ] d       →  prev / next diagnostic
 
-🪟 Floating/Tiling:
-   alt-shift-f       →  make window floating
-   alt-shift-t       →  TILE WINDOW (brings off-screen floating windows into view!)
-"'
+🔀 GIT
+   SPACE g g       →  lazygit
+   SPACE g b       →  git blame
+   ] h / [ h       →  next / prev hunk
+CHEAT
+}
 
 # ── CORE VIM MOTIONS ──────────────────────────────────────────
 function vm() {
@@ -364,193 +424,16 @@ cat <<'CHEAT'
 CHEAT
 }
 
-# ── FILE OPERATIONS (Neo-tree + buffers) ──────────────────────
-function nvf() {
-cat <<'CHEAT'
-╭──────────────────────────────────────────────────────────╮
-│          FILE OPS  (Neo-tree, Buffers, Windows)         │
-╰──────────────────────────────────────────────────────────╯
+# ── AEROSPACE CHEATSHEET ──────────────────────────────────────
+alias as='echo "
+╭─────────────────────────────────────────╮
+│        AeroSpace Cheatsheet             │
+╰─────────────────────────────────────────╯
 
-📂 NEO-TREE (file explorer)
-   SPACE e         →  toggle file explorer (focus it)
-   SPACE E         →  toggle explorer in float
-
-   INSIDE NEO-TREE:
-   a               →  create new file (add / at end = folder)
-   d               →  delete file/folder
-   r               →  rename file/folder
-   c               →  copy file/folder
-   x               →  cut file/folder
-   p               →  paste file/folder
-   ENTER           →  open file
-   SPACE           →  preview file
-   H               →  toggle hidden files
-   R               →  refresh tree
-   /               →  filter/search in tree
-
-📑 BUFFERS (tabs in the tab bar)
-   SHIFT-h         →  previous buffer (tab)
-   SHIFT-l         →  next buffer (tab)
-   SPACE b d       →  close current buffer
-   SPACE b o       →  close all other buffers
-   SPACE f b       →  find buffers (Telescope)
-   SPACE `         →  switch to last buffer
-
-🪟 WINDOWS (splits)
-   SPACE w s       →  split window horizontal (below)
-   SPACE w v       →  split window vertical (right)
-   SPACE w d       →  close current window
-   CTRL-h/j/k/l   →  navigate between windows
-CHEAT
-}
-
-# ── SEARCH & GREP ─────────────────────────────────────────────
-function nvs() {
-cat <<'CHEAT'
-╭──────────────────────────────────────────────────────────╮
-│          SEARCH & GREP  (Telescope + grug-far)          │
-╰──────────────────────────────────────────────────────────╯
-
-🔍 TELESCOPE (fuzzy finder)
-   SPACE SPACE     →  find files (root dir)
-   SPACE f f       →  find files (root dir)
-   SPACE f r       →  recent files
-
-   SPACE s g       →  GREP across project (live grep!)
-   SPACE s w       →  search word under cursor
-   SPACE /         →  grep in open buffers
-
-   SPACE s s       →  goto symbol (current file)
-   SPACE s k       →  search keymaps
-   SPACE s h       →  search help
-   SPACE s t       →  search TODO comments
-
-   INSIDE TELESCOPE:
-   CTRL-j / CTRL-k →  move down / up in results
-   ENTER           →  open selected
-   CTRL-x          →  open in horizontal split
-   CTRL-v          →  open in vertical split
-   ESC             →  close telescope
-
-🔍 IN-FILE SEARCH
-   / <text>        →  search forward
-   ? <text>        →  search backward
-   n / N           →  next / previous match
-   *  / #          →  search word under cursor fwd / back
-CHEAT
-}
-
-# ── HARPOON (quick file switching) ────────────────────────────
-function nvh() {
-cat <<'CHEAT'
-╭──────────────────────────────────────────────────────────╮
-│        HARPOON  (instant file switching, no grep)       │
-╰──────────────────────────────────────────────────────────╯
-
-📌 YOUR HARPOON KEYMAPS:
-   SPACE a         →  add current file to harpoon list
-   CTRL-e          →  toggle harpoon quick menu
-   SPACE h 1       →  jump to harpoon file 1
-   SPACE h 2       →  jump to harpoon file 2
-   SPACE h 3       →  jump to harpoon file 3
-   SPACE h 4       →  jump to harpoon file 4
-   CTRL-p          →  previous harpoon file
-   CTRL-n          →  next harpoon file
-
-   WORKFLOW:
-   1. Open files you work on frequently
-   2. SPACE a  to add each one
-   3. CTRL-e  to see your list
-   4. SPACE h1-h4  to instantly jump between them
-
-   IN HARPOON MENU:
-   ENTER           →  open selected file
-   d d             →  remove file from list
-   q / ESC         →  close menu
-CHEAT
-}
-
-# ── FULL LAZYVIM CHEATSHEET ───────────────────────────────────
-function nv() {
-cat <<'CHEAT'
-╭──────────────────────────────────────────────────────────╮
-│  LAZYVIM MASTER CHEATSHEET  (SPACE = leader)            │
-│                                                         │
-│  vm  = vim motions    nvf = file/buffer/window ops      │
-│  nvs = search/grep    nvh = harpoon                     │
-│  nvkeys = open full keybinds markdown                   │
-╰──────────────────────────────────────────────────────────╯
-
-⌨️  WHICH-KEY: press SPACE and wait — shows all keybinds!
-
-💡 LSP (code intelligence)
-   K               →  hover info / docs
-   gd              →  go to definition
-   gr              →  go to references
-   gI              →  go to implementation
-   SPACE c a       →  code actions
-   SPACE c r       →  rename symbol
-   SPACE c f       →  format file/selection
-   [ d / ] d       →  prev / next diagnostic
-
-🔀 GIT
-   SPACE g g       →  lazygit (full TUI)
-   SPACE g b       →  git blame line
-   SPACE g s       →  git status
-   ] h / [ h       →  next / prev hunk (gitsigns)
-   SPACE g h s     →  stage hunk
-   SPACE g h r     →  reset hunk
-
-⚙️  UI TOGGLES
-   SPACE u w       →  toggle word wrap
-   SPACE u l       →  toggle line numbers
-   SPACE u d       →  toggle diagnostics
-
-📦 LAZY (plugin manager)
-   :Lazy           →  open plugin manager
-   :Mason          →  open LSP/tool installer
-CHEAT
-}
-
-# ── FAQ: all aliases at a glance ─────────────────────────────
-function faq() {
-cat <<'CHEAT'
-╭──────────────────────────────────────────────────────────╮
-│              ALL MY ALIASES  (quick ref)                  │
-╰──────────────────────────────────────────────────────────╯
-
-📁 NAVIGATION
-   p/sb/tech/learn/ops/godev/work/agi/myblog
-
-🔧 SHELL
-   zshrc/src/c/q/btw/tr/up/up2/up3
-
-🔀 GIT
-   g/gs/ga/gm/gp/gpl/glog/gr/grs/grh/stash/apply
-
-🐹 GO
-   grun/gv/gver
-
-🏗️  TERRAFORM
-   tf/tfi/tfa/tfp/tfc/tfd/tff/tfg/tfim
-
-🐍 PYTHON
-   ve/va/vq
-
-🖥️  MACOS / WINDOW MGMT
-   as/asw/asfloat/astile/rsa/togglemenu/showsketchy/showmac
-   jankyon/jankyoff/qf
-
-🤖 AI
-   ai/aii/aiq (OpenCode)
-   cc/cco/ccs/ccr/ccl/cc-portal/cc-backend/ccp/ccp-fe/ccp-be
-
-📝 NEOVIM CHEATSHEETS
-   vm   = vim motions & editing
-   nvf  = files, buffers, windows
-   nvs  = search, grep, telescope
-   nvh  = harpoon quick-switch
-   nv   = master overview (LSP, git)
-   nvkeys = open full keybinds in nvim
-CHEAT
-}
+🧭 Focus:        alt-h/j/k/l
+📦 Move:         alt-shift-h/j/k/l
+🔧 Resize:       alt-r (then h/j/k/l, esc to exit)
+❌ Quit:         cmd-q
+🖥️  Workspaces:   alt-1/2/3 (shift to move window)
+🪟 Float/Tile:   alt-shift-f / alt-shift-t
+"'
