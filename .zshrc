@@ -108,24 +108,6 @@ alias ccs="claude --model sonnet"
 alias ccr="claude --resume"
 alias ccl="claude --resume --list"
 
-# Agility Credit repo-specific agents
-alias cc-portal="cd ~ && cd Desktop/PARA/2\ Areas/work/agilitycredit/portal-spa && claude --model opus"
-alias cc-spa="cd ~ && cd Desktop/PARA/2\ Areas/work/agilitycredit/spa-frontend && claude --model opus"
-alias cc-backend="cd ~ && cd Desktop/PARA/2\ Areas/work/agilitycredit/website-backend && claude --model opus"
-alias cc-infra="cd ~ && cd Desktop/PARA/2\ Areas/work/agilitycredit/infrastructure && claude --model opus"
-alias cc-web="cd ~ && cd Desktop/PARA/2\ Areas/work/agilitycredit/website && claude --model opus"
-alias cc-upload="cd ~ && cd Desktop/PARA/2\ Areas/work/agilitycredit/upload-spa && claude --model opus"
-alias cc-comply="cd ~ && cd Desktop/PARA/2\ Areas/work/agilitycredit/compliance-spa && claude --model opus"
-alias cc-int="cd ~ && cd Desktop/PARA/2\ Areas/work/agilitycredit/integration-cloud && claude --model opus"
-alias cc-reports="cd ~ && cd Desktop/PARA/2\ Areas/work/agilitycredit/reports && claude --model opus"
-
-# Parallel agent launcher
-alias ccp="claude-parallel"
-alias ccp-fe="claude-parallel frontend"
-alias ccp-be="claude-parallel backend"
-alias ccp-all="claude-parallel all"
-alias ccp-kill="claude-parallel --kill"
-
 # ╔═══════════════════════════════════════════════════════════════╗
 # ║                     OPENCODE / AI ALIASES                     ║
 # ╚═══════════════════════════════════════════════════════════════╝
