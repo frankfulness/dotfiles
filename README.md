@@ -187,6 +187,7 @@ brew bundle dump --file=~/.config/dotfiles/Brewfile --force
 [![Terraform](https://img.shields.io/badge/terraform-1d2021?style=flat-square&logo=terraform&logoColor=d3869b)](https://www.terraform.io/)
 [![tmux](https://img.shields.io/badge/tmux-1d2021?style=flat-square&logo=tmux&logoColor=b8bb26)](https://github.com/tmux/tmux)
 [![tree](https://img.shields.io/badge/tree-1d2021?style=flat-square&logo=gnubash&logoColor=8ec07c)](https://linux.die.net/man/1/tree)
+[![Yazi](https://img.shields.io/badge/yazi-1d2021?style=flat-square&logo=github&logoColor=fabd2f)](https://yazi-rs.github.io/)
 [![yamllint](https://img.shields.io/badge/yamllint-1d2021?style=flat-square&logo=yaml&logoColor=fb4934)](https://github.com/adrienverge/yamllint)
 [![Zellij](https://img.shields.io/badge/zellij-1d2021?style=flat-square&logo=github&logoColor=fe8019)](https://zellij.dev/)
 [![zoxide](https://img.shields.io/badge/zoxide-1d2021?style=flat-square&logo=github&logoColor=fabd2f)](https://github.com/ajeetdsouza/zoxide)
