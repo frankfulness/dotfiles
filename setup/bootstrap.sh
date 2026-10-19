@@ -74,6 +74,7 @@ if [ "$CONFIG_ONLY" -eq 0 ]; then
         fi
     fi
     printf '\n2. Curated applications, fonts, and shell tools\n'
+    printf 'Existing apps in /Applications or ~/Applications are skipped, not adopted or replaced.\n'
     run brew bundle install --verbose --no-upgrade --file="$ROOT/Brewfile"
     printf '\n3. Oh My Zsh, upstream NVM, and Node LTS\n'
     if [ ! -e "$HOME/.oh-my-zsh" ]; then
@@ -114,6 +115,9 @@ fi
 if [ "$CONFIG_ONLY" -eq 0 ] && [ "$EXTENSIONS" -eq 1 ]; then
     printf '\n5. VS Code extensions\n'
     code_bin="/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code"
+    if [ ! -x "$code_bin" ] && [ -x "$HOME/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code" ]; then
+        code_bin="$HOME/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code"
+    fi
     if [ "$DRY_RUN" -eq 0 ] && [ ! -x "$code_bin" ]; then
         printf 'VS Code CLI not found at %s\n' "$code_bin" >&2
         exit 1

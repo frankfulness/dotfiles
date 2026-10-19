@@ -18,6 +18,82 @@ SPEC.loader.exec_module(PUBLIC)
 
 
 class SetupTests(unittest.TestCase):
+    def brew_entries(self, manifest, system_apps=(), user_apps=(), broken_links=()):
+        # Evaluate only the Brewfile DSL, not Homebrew. System app lookups are
+        # redirected into a fixture so this Mac's real apps cannot affect tests.
+        harness = r'''
+require "json"
+[:exist?, :symlink?].each do |method|
+  original = File.method(method)
+  File.define_singleton_method(method) do |path|
+    fixture = path.start_with?("/Applications/") ?
+      ENV.fetch("TEST_SYSTEM_APPS") + path.delete_prefix("/Applications") : path
+    original.call(fixture)
+  end
+end
+entries = {"brew" => [], "cask" => [], "mas" => []}
+context = Object.new
+entries.each_key do |kind|
+  context.define_singleton_method(kind) { |name, *options| entries[kind] << name }
+end
+context.instance_eval(File.read(ARGV.fetch(0)), ARGV.fetch(0))
+puts "RESULT=" + JSON.generate(entries)
+'''
+        with tempfile.TemporaryDirectory() as temp:
+            home = Path(temp)
+            system = home / "system-applications"
+            user = home / "Applications"
+            system.mkdir()
+            user.mkdir()
+            for folder, names in ((system, system_apps), (user, user_apps)):
+                for name in names:
+                    (folder / (name + ".app")).mkdir()
+            for name in broken_links:
+                (system / (name + ".app")).symlink_to(home / "missing-app")
+            result = subprocess.run(
+                ["/usr/bin/ruby", "-e", harness, str(configure.ROOT / manifest)],
+                env=dict(os.environ, HOME=str(home), TEST_SYSTEM_APPS=str(system)),
+                capture_output=True, text=True, check=True, timeout=15,
+            )
+            return json.loads(result.stdout.split("RESULT=")[-1]), result.stdout
+
+    def test_fresh_mac_requests_all_apps(self):
+        entries, _ = self.brew_entries("Brewfile")
+        self.assertEqual(len(entries["cask"]), 17)  # 15 apps and two fonts.
+        self.assertIn("warp", entries["cask"])
+        self.assertIn("visual-studio-code", entries["cask"])
+
+    def test_existing_system_and_user_apps_and_symlinks_are_skipped(self):
+        entries, output = self.brew_entries(
+            "Brewfile", system_apps=("Warp",),
+            user_apps=("Visual Studio Code",), broken_links=("Slack",),
+        )
+        for token in ("warp", "visual-studio-code", "slack"):
+            self.assertNotIn(token, entries["cask"])
+        self.assertIn("claude", entries["cask"])
+        self.assertIn("Skipping Warp:", output)
+        self.assertIn("Skipping Visual Studio Code:", output)
+        self.assertIn("Skipping Slack:", output)
+
+    def test_all_existing_apps_leave_only_font_casks(self):
+        apps = (
+            "Warp", "Claude", "Docker", "Figma", "Slack", "zoom.us",
+            "Obsidian", "Google Chrome", "Visual Studio Code", "Bruno",
+            "Clipy", "Screen Studio", "Raycast", "Affinity", "Spotify",
+        )
+        entries, _ = self.brew_entries("Brewfile", system_apps=apps)
+        self.assertEqual(entries["cask"], ["font-0xproto-nerd-font", "font-hack"])
+        self.assertIn("git", entries["brew"])
+
+    def test_app_store_only_requests_missing_apps(self):
+        entries, _ = self.brew_entries("setup/Brewfile.app-store")
+        self.assertEqual(entries["mas"], ["Dato", "Cursor Pro", "Keystroke Pro"])
+        entries, _ = self.brew_entries(
+            "setup/Brewfile.app-store", system_apps=("Dato",),
+            user_apps=("Cursor Pro",), broken_links=("Keystroke Pro",),
+        )
+        self.assertEqual(entries["mas"], [])
+
     def deploy(self, home, **kwargs):
         with contextlib.redirect_stdout(io.StringIO()):
             configure.deploy(home, **kwargs)

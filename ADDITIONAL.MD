@@ -26,6 +26,10 @@ The installer must run as your normal user, **not** with `sudo`. Homebrew or ind
 
 Homebrew comes before the apps because it installs them. Setup does not remove applications, clean Homebrew packages, start background services, import credentials, or silently grant permissions. Existing Homebrew packages are not upgraded by this bootstrap. It does not install Homebrew Node, Powerlevel10k, extra terminals, window managers, or the legacy repository's entire tool collection.
 
+GUI apps already present in `/Applications` or `~/Applications` are skipped with a visible message, even if installed manually rather than through Homebrew. They are not downloaded, adopted, upgraded, or replaced by these app entries. Existing app symlinks (including broken ones) are also left alone for manual review. Apps stored elsewhere or renamed are not detected by these checks. This applies to the optional App Store apps too. Fonts still use Homebrew's installed-package checks; Homebrew may update dependencies needed by a newly installed package despite `--no-upgrade`.
+
+This app protection does **not** disable configuration restoration: step 4 still backs up and replaces differing managed config files, and step 5 installs the configured VS Code extensions.
+
 ### Options
 
 - `./install.sh --dry-run`: preview; no downloads, application installs, or configuration changes.

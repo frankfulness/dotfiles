@@ -1,5 +1,11 @@
 # Requires App Store sign-in and prior purchase with that Apple Account.
+app_present = lambda do |name|
+  paths = ["/Applications/#{name}.app", File.expand_path("~/Applications/#{name}.app")]
+  present = paths.any? { |path| File.exist?(path) || File.symlink?(path) }
+  puts "Skipping #{name}: app already present; leaving it untouched." if present
+  present
+end
 brew "mas"
-mas "Dato", id: 1470584107
-mas "Cursor Pro", id: 1447043133
-mas "Keystroke Pro", id: 1572206224
+mas "Dato", id: 1470584107 unless app_present.call("Dato")
+mas "Cursor Pro", id: 1447043133 unless app_present.call("Cursor Pro")
+mas "Keystroke Pro", id: 1572206224 unless app_present.call("Keystroke Pro")
