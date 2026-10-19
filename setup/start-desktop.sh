@@ -1,6 +1,7 @@
 #!/bin/bash
 # Re-run after granting permissions; does not install or copy configuration.
 set -euo pipefail
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 DRY_RUN=0
 KEEP_MENU_BAR=0
 for arg in "$@"; do
@@ -28,6 +29,10 @@ if [ "$DRY_RUN" -eq 0 ]; then
             exit 1
         }
     done
+fi
+
+if command -v python3 >/dev/null 2>&1; then
+    run python3 -B "$ROOT/setup/desktop_layout.py"
 fi
 
 ready=0

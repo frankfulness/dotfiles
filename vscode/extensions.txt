@@ -1,5 +1,6 @@
 # Reviewed work-focused extensions; credentials and extension storage excluded.
 aaron-bond.better-comments
+amazonwebservices.aws-toolkit-vscode
 bierner.markdown-mermaid
 bradlc.vscode-tailwindcss
 dbaeumer.vscode-eslint
@@ -13,9 +14,12 @@ hashicorp.terraform
 jdinhlife.gruvbox
 ms-azuretools.vscode-containers
 ms-playwright.playwright
+ms-toolsai.jupyter
 ms-python.python
 ms-python.vscode-pylance
 ms-vscode-remote.remote-containers
+ms-vscode.atom-keybindings
+ms-vscode.makefile-tools
 prisma.prisma
 redhat.vscode-xml
 redhat.vscode-yaml

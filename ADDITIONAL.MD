@@ -42,6 +42,7 @@ This app protection does **not** disable configuration restoration: the shell/Wa
 - `./install.sh --app-store`: full setup plus purchased App Store apps.
 - `./install.sh --non-interactive`: skip Git identity prompts; configure identity separately.
 - `./install.sh --skip-extensions`: omit VS Code extension installation.
+- `./install.sh --vscode-only`: restore only VS Code settings/keybindings/snippets and install the declared missing extensions, without touching the shell, Warp, Git, or desktop services.
 - `./install.sh --desktop`: full setup plus AeroSpace, SketchyBar, and JankyBorders.
 - `./install.sh --desktop-only`: skip the main GUI app bundle and VS Code extension stage; install shell/desktop dependencies, set up Oh My Zsh/NVM/Node LTS, copy base and desktop configs, then start desktop services.
 - `./install.sh --config-only --desktop`: copy base and desktop configs without installing tools or starting services.
@@ -64,13 +65,15 @@ After installation, open Docker Desktop to complete its first-run setup. Sign in
 
 `.zshrc` preserves the portable parts of the current setup: Oh My Zsh Git/web-search plugins, autosuggestions, syntax highlighting, NVM, Git/Python/navigation aliases, fzf colors/previews, zoxide, and the active Starship prompt. Starship remains useful in other terminals even though Warp currently uses its native prompt (`honor_ps1 = false`). Powerlevel10k is not installed.
 
-Work/customer-specific helpers, internal endpoints, cloud account identifiers, personal vault/project paths, and credential assignments are intentionally excluded. Keep those in `~/.zshrc.local`; use `setup/zshrc.local.example` as a starting point. `~/.zprofile.local` is also supported. These files are ignored by Git. Optional aliases activate only when their tools are already present; Go, Terraform, Neovim, and Claude Code are not silently added as extra applications.
+Work/customer-specific helpers, internal endpoints, cloud account identifiers, personal vault/project paths, and credential assignments are intentionally excluded. Keep those in `~/.zshrc.local`; use `setup/zshrc.local.example` as a starting point. `~/.zprofile.local` is also supported. These files are ignored by Git. Optional aliases activate only when their tools are already present; Go, Terraform, and Claude Code are not silently added as extra applications. Neovim is part of the standard shell-tool phase.
 
 Files are **copied**, not symlinked. Editing a live config cannot accidentally edit the public repository. When updating the repo later, copy only reviewed changes back; never recursively copy your home directory or app support folders.
 
 ## Warp
 
 `warp/` captures the current portable settings, custom keybindings, custom theme, and its full-resolution background image. Text/EXIF metadata is stripped from the PNG without changing its pixel data. `font-0xproto-nerd-font` and Hack are installed to match the terminal/AI fonts. The custom theme's absolute path is rendered for the new user's home at install time.
+
+The PNG master is retained, but the active theme uses the full-resolution `custom/custom.jpg` export. That image reference is relative to `~/.warp/themes`, not a `~`-prefixed path that the image loader may interpret literally. Assets are deployed before the selected theme/settings. If Warp has not discovered a newly added image/theme yet, reopen Warp to refresh its theme cache.
 
 The portable settings explicitly disable agent attribution using `agents.warp_agent.other.agent_attribution_enabled = false`.
 
@@ -83,6 +86,16 @@ Only redistribute images/fonts you have rights to share. Berkeley Mono is not bu
 ## VS Code
 
 `vscode/settings.json`, `vscode/keybindings.json`, and `vscode/snippets/` restore the reviewed current preferences and global snippets. The extension list is curated for development, rather than exporting all historical extensions. Temporary Postman instruction paths, a machine-specific Python interpreter, the old terminal environment injection, and obsolete extension/model settings are omitted. Extensions' credential storage, profiles' private state, workspace data, and history are not copied. Sign in to extensions separately.
+
+`./install.sh --vscode-only` completes that setup independently after Visual Studio Code is installed. It includes the Gruvbox theme, icons, formatting/language tools, and extensions supporting the configured Atom keymap, notebooks, Makefiles, and AWS tooling. Existing extension IDs are compared case-insensitively and skipped rather than upgraded or removed. Failures are reported individually; rerun to retry missing items. Reload the VS Code window afterward and sign in to Copilot/AWS/GitHub as needed. Use `--vscode-only --config-only` to restore only preferences. `DOTFILES_VSCODE_CLI` can select a nonstandard CLI location.
+
+`--desktop-only` and `--config-only` still skip extension installation, but now print the explicit completion command so restored preferences are not mistaken for a finished editor setup.
+
+## Neovim
+
+The shell-first Homebrew phase installs `neovim`. The normal, desktop-only, and config-only setup modes copy `init.lua`, the `lua/` modules, `lazy-lock.json`, `lazyvim.json`, `.neoconf.json`, and `stylua.toml` from the repo into `~/.config/nvim`, backing up differing files and detaching an old config-directory symlink safely. Untracked runtime/plugin caches and private local files are not imported from the machine.
+
+Open `nvim` after setup to bootstrap LazyVim/plugins, then run `:checkhealth` inside Neovim for language-specific dependencies. Plugin downloads happen on first launch, not as hidden install-time code execution. Reloading `.zshrc` activates the `vim` alias when Neovim is available.
 
 ## Git identity and signing
 
@@ -121,7 +134,7 @@ git diff --check
 
 The checker reports locations, never secret values. It detects common credential formats, literal credential assignments, and machine-specific home paths; it is not a comprehensive secret scanner or a guarantee of safety. Use an independent scanner such as Gitleaks as an additional check. Ignore rules do not protect secrets in already-tracked files. If a real credential ever entered public history, revoke/rotate it; deleting its current line does not erase the old commits.
 
-Legacy Neovim and extra-terminal configs are retained for reference but are not installed by default.
+Extra-terminal configs are retained for reference but are not installed by default. Neovim configuration is deployed by the standard editor-config stage.
 
 ## Shell and desktop setup after cloning
 
@@ -136,6 +149,8 @@ Config copies go into `~/.config/aerospace`, `~/.config/sketchybar`, and `~/.con
 Once configs are copied, setup opens/reloads AeroSpace and restarts the user-level Homebrew borders/SketchyBar services (which run at future logins). It waits for the bar to respond, reloads the full bar configuration, and refreshes its AeroSpace workspace state. Workspace initialization runs separately, so a slow AeroSpace startup cannot stop the clock, Spotify, or event listener from loading. To retry startup without reinstalling or copying anything, run `bash setup/start-desktop.sh`. AeroSpace is configured to start at login.
 
 After SketchyBar responds and accepts a reload, desktop startup enables native menu-bar auto-hide (`defaults write NSGlobalDomain _HIHideMenuBar -bool true`) and restarts the user's SystemUIServer so the preference takes effect. If the bar does not respond, this preference is left unchanged. Use `--keep-menu-bar` on the installer or startup helper to skip this change. That option preserves the current preference; to show the native menu bar again, set `_HIHideMenuBar` to `false` and restart SystemUIServer, or change the menu-bar auto-hide setting in System Settings.
+
+Before reloading AeroSpace, desktop startup fits `gaps.outer.top` to the live SketchyBar height/offset plus 10 pixels of clearance. It subtracts each notched display's already-reserved safe area using AppKit screen information, with per-monitor rules and a non-notched fallback. This avoids counting the hidden native menu/notch area twice. Previous layout files are backed up privately; the public repo keeps a portable fallback rather than a machine-specific display rule. Rerun `bash setup/start-desktop.sh` after changing monitor arrangements or the bar geometry.
 
 macOS still requires you to approve AeroSpace's Accessibility access and any requested Automation/Screen Recording permissions. The setup does not change display/Spaces preferences, unload system services, remove quarantine flags, or grant permissions automatically. JankyBorders requires macOS 14 or newer. Desktop appearance, multi-monitor behavior, and actual permissions need verification on the new Mac.
 

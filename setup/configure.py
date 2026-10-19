@@ -18,7 +18,7 @@ PARA_DIRS = (
 
 
 def deploy(home, dry_run=False, interactive=False, desktop=False, phase="all"):
-    if phase not in ("all", "warp", "remaining"):
+    if phase not in ("all", "warp", "remaining", "vscode"):
         raise ValueError("Unknown configuration phase: " + phase)
     home = home.resolve()
     backup = home / ".local/state/dotfiles/backups" / datetime.now().strftime("%Y%m%d-%H%M%S-%f")
@@ -26,10 +26,12 @@ def deploy(home, dry_run=False, interactive=False, desktop=False, phase="all"):
         (".zshrc", ".zshrc"), (".zprofile", ".zprofile"),
         (".gitconfig", ".gitconfig"), ("starship.toml", ".config/starship.toml"),
         ("git/ignore", ".config/git/ignore"),
-        ("warp/settings.toml.template", ".warp/settings.toml"),
-        ("warp/keybindings.yaml", ".warp/keybindings.yaml"),
-        ("warp/themes/custom/custom.yaml", ".warp/themes/custom/custom.yaml"),
+        # Install assets before selecting/reloading the theme in a running Warp.
         ("warp/themes/custom/custom.png", ".warp/themes/custom/custom.png"),
+        ("warp/themes/custom/custom.jpg", ".warp/themes/custom/custom.jpg"),
+        ("warp/themes/custom/custom.yaml", ".warp/themes/custom/custom.yaml"),
+        ("warp/keybindings.yaml", ".warp/keybindings.yaml"),
+        ("warp/settings.toml.template", ".warp/settings.toml"),
         ("warp/tab_configs/default.toml", ".warp/tab_configs/default.toml"),
         ("warp/tab_configs/startup.toml", ".warp/tab_configs/startup.toml"),
         ("warp/launch_configurations/default.yaml.template", ".warp/launch_configurations/default.yaml"),
@@ -40,12 +42,30 @@ def deploy(home, dry_run=False, interactive=False, desktop=False, phase="all"):
         if source.is_file():
             targets.append((str(source.relative_to(ROOT)), "Library/Application Support/Code/User/snippets/" + source.name))
 
+    nvim_targets = []
+    if phase in ("all", "remaining"):
+        root = ROOT / "nvim"
+        if not root.is_dir() or root.is_symlink() or (root / "lua").is_symlink():
+            raise FileNotFoundError("Missing or symlinked Neovim configuration source")
+        names = ("init.lua", "lazy-lock.json", "lazyvim.json", ".neoconf.json", "stylua.toml")
+        sources = [root / name for name in names]
+        sources.extend(sorted((root / "lua").rglob("*.lua")))
+        for source in sources:
+            if source.is_symlink():
+                raise ValueError("Refusing symlinked Neovim source: " + str(source.relative_to(ROOT)))
+            nvim_targets.append((
+                str(source.relative_to(ROOT)), ".config/nvim/" + str(source.relative_to(root)),
+            ))
+        targets.extend(nvim_targets)
+
     if phase == "warp":
         targets = [(source, target) for source, target in targets if source.startswith("warp/")]
+    elif phase == "vscode":
+        targets = [(source, target) for source, target in targets if source.startswith("vscode/")]
     elif phase == "remaining":
         targets = [(source, target) for source, target in targets
                    if source not in (".zshrc", ".zprofile", "starship.toml") and not source.startswith("warp/")]
-    desktop = desktop and phase != "warp"
+    desktop = desktop and phase in ("all", "remaining")
     desktop_targets = []
     if desktop:
         for directory in ("aerospace", "sketchybar", "borders"):
@@ -109,19 +129,19 @@ def deploy(home, dry_run=False, interactive=False, desktop=False, phase="all"):
     if desktop:
         # AeroSpace reports an ambiguity if both supported config locations exist.
         save_existing(".aerospace.toml")
-        # Do not follow desktop-directory symlinks into a previous checkout.
-        for _, relative in desktop_targets:
-            if not relative.startswith(".config/"):
-                continue
-            parts = Path(relative).parts
-            for length in range(2, len(parts)):
-                ancestor = Path(*parts[:length])
-                if (home / ancestor).is_symlink():
-                    save_existing(str(ancestor))
+    # Do not follow managed config-directory symlinks into another checkout.
+    for _, relative in desktop_targets + nvim_targets:
+        if not relative.startswith(".config/"):
+            continue
+        parts = Path(relative).parts
+        for length in range(2, len(parts)):
+            ancestor = Path(*parts[:length])
+            if (home / ancestor).is_symlink():
+                save_existing(str(ancestor))
 
     local_git = home / ".gitconfig.local"
     current_git = home / ".gitconfig"
-    if phase != "warp" and not local_git.exists() and current_git.is_file():
+    if phase in ("all", "remaining") and not local_git.exists() and current_git.is_file():
         old = current_git.read_bytes()
         if old != (ROOT / ".gitconfig").read_bytes():
             # Keep the old config private, minus the include that would recurse.
@@ -162,11 +182,11 @@ def deploy(home, dry_run=False, interactive=False, desktop=False, phase="all"):
                 json.dumps(str(home / ".warp/themes/custom/custom.yaml"), ensure_ascii=False),
             ).encode()
         mode = 0o600
-        if (source, target) in desktop_targets:
+        if (source, target) in desktop_targets + nvim_targets:
             executable = (ROOT / source).stat().st_mode & 0o111 or source.endswith((".sh", "sketchybarrc", "bordersrc"))
             mode = 0o755 if executable else 0o644
         write(target, content, mode=mode)
-    if phase == "warp":
+    if phase in ("warp", "vscode"):
         if not dry_run and backup.exists():
             backup.chmod(0o700)
             print("Backup directory:", backup)
@@ -199,7 +219,7 @@ def main():
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--non-interactive", action="store_true")
     parser.add_argument("--desktop", action="store_true", help="Also copy AeroSpace, SketchyBar, and JankyBorders")
-    parser.add_argument("--phase", choices=("all", "warp", "remaining"), default="all")
+    parser.add_argument("--phase", choices=("all", "warp", "remaining", "vscode"), default="all")
     args = parser.parse_args()
     deploy(Path.home(), dry_run=args.dry_run, interactive=not args.non_interactive and os.isatty(0), desktop=args.desktop, phase=args.phase)
 

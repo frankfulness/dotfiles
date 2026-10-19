@@ -5,7 +5,7 @@ accent: "#4c3120"
 cursor: "#39FF14"
 foreground: "#ffffff"
 background_image:
-  path: ~/.warp/themes/custom/custom.png
+  path: custom/custom.jpg
   opacity: 30
 details: darker
 terminal_colors:

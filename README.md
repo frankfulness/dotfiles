@@ -23,7 +23,7 @@ _Velocity • Discoverability • Intelligence • Extensibility_
 | :------- | :---- |
 | **Shell** | [Zsh](https://www.zsh.org/) + [Oh My Zsh](https://ohmyz.sh/) |
 | **Terminal** | [Warp](https://www.warp.dev/) |
-| **Editor** | [VSCode](https://code.visualstudio.com/) |
+| **Editor** | [Neovim](https://neovim.io/) ([LazyVim](https://www.lazyvim.org/)) • [VSCode](https://code.visualstudio.com/) |
 | **Prompt** | [Starship](https://starship.rs/) |
 | **Node** | [NVM](https://github.com/nvm-sh/nvm) + Node LTS |
 | **Git** | [Git](https://git-scm.com/) + [GitHub CLI](https://cli.github.com/) |
@@ -48,6 +48,8 @@ exec zsh -l
 ```
 
 Copies `.zshrc` to your home directory, restores the base configs, and installs/configures AeroSpace, SketchyBar, and JankyBorders. Existing configs are backed up first. Approve AeroSpace's Accessibility prompt when asked.
+
+Neovim and its config are included in the normal/desktop setup. To finish VSCode independently (settings, theme/icons, and missing extensions), run `./install.sh --vscode-only`.
 
 <details>
 <summary>📦 What the script does</summary>

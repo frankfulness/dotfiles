@@ -38,7 +38,7 @@ inner.horizontal = 10
 inner.vertical =   10
 outer.left =       15
 outer.bottom =     15
-outer.top =        60 # Increased for clean spacing under sketchybar
+outer.top =        59 # setup/desktop_layout.py subtracts the actual display safe area
 outer.right =      15
 
 # 'main' binding mode declaration
@@ -135,6 +135,7 @@ run = 'layout floating'
 
 # Catch-all: refresh sketchybar icons whenever any new window appears
 [[on-window-detected]]
+if = 'true'
 run = 'exec-and-forget sleep 0.3 && sketchybar --trigger aerospace_workspace_change'
 
 # GUI apps do not read ~/.zshrc; expose Homebrew to the SketchyBar callbacks.

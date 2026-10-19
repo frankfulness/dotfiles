@@ -150,6 +150,8 @@ printf 'sketchybar %s\\n' "$*" >> "$TEST_LOG"
 if [ "$1" = --query ] && [ "$TEST_BAR_AVAILABLE" = 0 ]; then exit 1; fi
 ''')
         stub("sleep", "exit 0\n")
+        # AppKit screen probing must not depend on this Mac's actual displays.
+        stub("osascript", "printf '[]\\n'\n")
         stub("borders", "exit 0\n")
         stub("defaults", 'printf "defaults %s\\n" "$*" >> "$TEST_LOG"\n')
         stub("killall", 'printf "killall %s\\n" "$*" >> "$TEST_LOG"\n')

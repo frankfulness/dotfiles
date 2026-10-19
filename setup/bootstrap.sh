@@ -11,6 +11,7 @@ DESKTOP=0
 DESKTOP_ONLY=0
 START_DESKTOP=1
 KEEP_MENU_BAR=0
+VSCODE_ONLY=0
 
 usage() {
     printf '%s\n' "Usage: ./install.sh [options]" \
@@ -19,6 +20,7 @@ usage() {
         "  --app-store        Also restore the three purchased App Store apps" \
         "  --non-interactive  Skip Git identity prompts" \
         "  --skip-extensions  Skip VS Code extension installation" \
+        "  --vscode-only      Restore VS Code settings and install missing extensions only" \
         "  --desktop          Also install/configure AeroSpace, SketchyBar, and JankyBorders" \
         "  --desktop-only     Set up shell, desktop, and configs; skip the main GUI app bundle" \
         "  --no-start         Copy desktop configs without starting desktop services" \
@@ -32,6 +34,7 @@ for arg in "$@"; do
         --app-store) APP_STORE=1 ;;
         --non-interactive) INTERACTIVE=0 ;;
         --skip-extensions) EXTENSIONS=0 ;;
+        --vscode-only) VSCODE_ONLY=1 ;;
         --desktop) DESKTOP=1 ;;
         --desktop-only) DESKTOP=1; DESKTOP_ONLY=1; EXTENSIONS=0 ;;
         --no-start) START_DESKTOP=0 ;;
@@ -42,6 +45,14 @@ for arg in "$@"; do
 done
 [ "$(uname -s)" = Darwin ] || { printf 'macOS only.\n' >&2; exit 1; }
 [ "$(id -u)" -ne 0 ] || { printf 'Run as your normal user, not sudo.\n' >&2; exit 1; }
+if [ "$VSCODE_ONLY" -eq 1 ]; then
+    vscode_args=()
+    [ "$DRY_RUN" -eq 0 ] || vscode_args+=(--dry-run)
+    if [ "$CONFIG_ONLY" -eq 1 ] || [ "$EXTENSIONS" -eq 0 ]; then
+        vscode_args+=(--settings-only)
+    fi
+    exec /bin/bash "$ROOT/setup/vscode.sh" ${vscode_args[@]+"${vscode_args[@]}"}
+fi
 
 install_desktop_dependencies() {
     run brew tap felixkratz/formulae
@@ -176,18 +187,12 @@ if [ "$DESKTOP" -eq 1 ] && [ "$CONFIG_ONLY" -eq 0 ] && [ "$START_DESKTOP" -eq 1 
 fi
 if [ "$CONFIG_ONLY" -eq 0 ] && [ "$EXTENSIONS" -eq 1 ]; then
     printf '\n8. VS Code extensions\n'
-    code_bin="/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code"
-    if [ ! -x "$code_bin" ] && [ -x "$HOME/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code" ]; then
-        code_bin="$HOME/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code"
-    fi
-    if [ "$DRY_RUN" -eq 0 ] && [ ! -x "$code_bin" ]; then
-        printf 'VS Code CLI not found at %s\n' "$code_bin" >&2
-        exit 1
-    fi
-    while IFS= read -r extension || [ -n "$extension" ]; do
-        case "$extension" in ''|\#*) continue ;; esac
-        run "$code_bin" --install-extension "$extension"
-    done < "$ROOT/vscode/extensions.txt"
+    vscode_args=(--extensions-only)
+    [ "$DRY_RUN" -eq 0 ] || vscode_args+=(--dry-run)
+    /bin/bash "$ROOT/setup/vscode.sh" "${vscode_args[@]}"
+else
+    printf '\nVS Code preferences restored; extension installation skipped in this mode.\n'
+    printf 'To finish the VS Code setup, run: ./install.sh --vscode-only\n'
 fi
 if [ "$CONFIG_ONLY" -eq 0 ] && [ "$DESKTOP_ONLY" -eq 0 ] && [ "$APP_STORE" -eq 1 ]; then
     printf '\n9. Purchased App Store apps (sign in to the App Store first)\n'
