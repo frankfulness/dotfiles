@@ -1,122 +1,145 @@
-# Mac dotfiles
+<div align="center">
 
-A focused, public-safe setup for a fresh Mac: Zsh + Oh My Zsh + Starship, a customized Warp terminal, VS Code, Node through NVM, Git, and a curated application list.
+# 🛠️ Dotfiles
 
-## Fresh Mac
+![macOS](https://img.shields.io/badge/macOS-1d2021?style=for-the-badge&logo=apple&logoColor=ebdbb2)
+![Warp](https://img.shields.io/badge/Warp-1d2021?style=for-the-badge&logo=warp&logoColor=8ec07c)
+![Zsh](https://img.shields.io/badge/Zsh-1d2021?style=for-the-badge&logo=zsh&logoColor=fe8019)
+![VSCode](https://img.shields.io/badge/VS_Code-1d2021?style=for-the-badge&logo=visualstudiocode&logoColor=83a598)
 
-Use the built-in Terminal to get started. If Git is unavailable, run `xcode-select --install`, complete Apple's installer, and then continue. Alternatively, download and extract this repository's ZIP from GitHub.
+_Velocity • Discoverability • Intelligence • Extensibility_
 
-```sh
-git clone https://github.com/frankfulness/dotfiles.git "$HOME/.config/dotfiles"
-cd "$HOME/.config/dotfiles"
+<img src="./images/books.jpg" alt="Ireland Dublin Trinity College Ancient Library" width="800" />
+
+**My macOS development environment — crafted for speed and aesthetics.**
+
+</div>
+
+---
+
+## 🏛️ Stack Overview
+
+| Category | Tools |
+| :------- | :---- |
+| **Shell** | [Zsh](https://www.zsh.org/) + [Oh My Zsh](https://ohmyz.sh/) |
+| **Terminal** | [Warp](https://www.warp.dev/) |
+| **Editor** | [VSCode](https://code.visualstudio.com/) |
+| **Prompt** | [Starship](https://starship.rs/) |
+| **Node** | [NVM](https://github.com/nvm-sh/nvm) + Node LTS |
+| **Git** | [Git](https://git-scm.com/) + [GitHub CLI](https://cli.github.com/) |
+| **Note System** | [Obsidian](https://obsidian.md/) |
+
+---
+
+## 🚀 Installation
+
+```bash
+git clone https://github.com/frankfulness/dotfiles.git ~/.config/dotfiles
+cd ~/.config/dotfiles
 ./install.sh --dry-run
 ./install.sh
 ```
 
-The installer must run as your normal user, **not** with `sudo`. Homebrew or individual installers may request administrator approval. Quit Warp and VS Code before restoring their settings; reopen them afterward. If the Command Line Tools are missing, setup opens Apple's installer and asks you to rerun after it completes.
+<details>
+<summary>📦 What the script does</summary>
 
-### Installation order
+1. Install Homebrew and the curated apps/tools.
+2. Set up Oh My Zsh, NVM, and Node LTS.
+3. Back up existing configs and copy shell, Git, Warp, and VSCode settings.
+4. Install VSCode extensions and create the Desktop PARA folders.
 
-1. Apple Command Line Tools and architecture-appropriate Homebrew.
-2. Curated applications, Git/tools, and fonts from `Brewfile`.
-3. Oh My Zsh, upstream NVM (pinned to v0.40.8 for a new install), and the current Node LTS. Existing NVM installs are reused, not overwritten; Node's default becomes `lts/*`.
-4. Copy reviewed configs, preserve private Git settings, and create the PARA folders.
-5. Install the reviewed VS Code extensions from `vscode/extensions.txt`.
-6. Optionally restore purchased App Store apps.
+</details>
 
-Homebrew comes before the apps because it installs them. Setup does not remove applications, clean Homebrew packages, start background services, import credentials, or silently grant permissions. Existing Homebrew packages are not upgraded by this bootstrap. It does not install Homebrew Node, Powerlevel10k, extra terminals, window managers, or the legacy repository's entire tool collection.
+<details>
+<summary>✅ Manual Steps After Install</summary>
 
-### Options
+1. Restart your terminal and sign in to your apps.
+2. Open Docker Desktop to finish its setup.
+3. Restore purchased Dato, Cursor Pro, and Keystroke Pro with `./install.sh --app-store`.
+4. Install [Shure MOTIV Mix](https://www.shure.com/en-US/products/software/motiv-mix).
+5. Activate licenses and approve macOS permissions as needed.
 
-- `./install.sh --dry-run`: preview; no downloads, application installs, or configuration changes.
-- `./install.sh --config-only`: restore configs and PARA only; requires Python 3 already installed.
-- `./install.sh --app-store`: full setup plus purchased App Store apps.
-- `./install.sh --non-interactive`: skip Git identity prompts; configure identity separately.
-- `./install.sh --skip-extensions`: omit VS Code extension installation.
+</details>
 
-Options can be combined. Rerun after fixing a failed step; identical config files are left unchanged. This is a resumable bootstrap, not a transactional system image or version-locked package snapshot. Never use `brew bundle dump --force` to replace the curated Brewfile with every app on a machine.
+For installer options, private overrides, Git signing, and backups, see [ADDITIONAL.MD](ADDITIONAL.MD).
 
-## Applications
+---
 
-**Homebrew:** Warp, Claude Desktop, Docker Desktop, Figma, Slack, Zoom, Obsidian, Google Chrome, Visual Studio Code, Bruno, Clipy, Screen Studio, Raycast, Affinity, and Spotify.
+## 🖥️ Third-Party Apps
 
-**App Store:** [Dato](https://apps.apple.com/app/id1470584107), [Cursor Pro](https://apps.apple.com/app/id1447043133), and [Keystroke Pro](https://apps.apple.com/app/id1572206224). Sign in to the App Store first and purchase/claim the apps with that Apple Account. `--app-store` uses `mas` to restore them; it cannot purchase apps or bypass account prompts. Cursor Pro is the pointer-highlighting utility, not the Cursor editor.
+### 🔧 Productivity & Utilities
 
-**Vendor install:** [Shure MOTIV Mix](https://www.shure.com/en-US/products/software/motiv-mix) for the MV7+. Download the current macOS installer from Shure, install it, and approve microphone/audio-driver permissions. The Homebrew `shureplus-motiv` package is a different, older product and is intentionally not installed. No unverified download URL or unattended driver installer is used.
+[![Cursor Pro](https://img.shields.io/badge/Cursor_Pro-1d2021?style=flat-square&logo=apple&logoColor=8ec07c)](https://apps.apple.com/app/id1447043133)
+[![Clipy](https://img.shields.io/badge/Clipy-1d2021?style=flat-square&logo=apple&logoColor=8ec07c)](https://clipy-app.com/)
+[![Dato](https://img.shields.io/badge/Dato-1d2021?style=flat-square&logo=apple&logoColor=fabd2f)](https://sindresorhus.com/dato)
+[![Keystroke Pro](https://img.shields.io/badge/Keystroke_Pro-1d2021?style=flat-square&logo=apple&logoColor=d3869b)](https://apps.apple.com/app/keystroke-pro/id1572206224)
+[![Raycast](https://img.shields.io/badge/Raycast-1d2021?style=flat-square&logo=raycast&logoColor=fe8019)](https://www.raycast.com/)
 
-After installation, open Docker Desktop to complete its first-run setup. Sign in to apps and activate paid licenses, including Screen Studio/Affinity if required. Accessibility, Screen Recording, microphone access, browser defaults, and login items require explicit user action. No app logins, license files, or app databases are stored here.
+### 💻 Development
 
-## Shell and private overrides
+[![Bruno](https://img.shields.io/badge/Bruno-1d2021?style=flat-square&logo=bruno&logoColor=fe8019)](https://www.usebruno.com/)
+[![Docker](https://img.shields.io/badge/Docker-1d2021?style=flat-square&logo=docker&logoColor=83a598)](https://www.docker.com/)
+[![VSCode](https://img.shields.io/badge/VSCode-1d2021?style=flat-square&logo=visualstudiocode&logoColor=83a598)](https://code.visualstudio.com/)
+[![Warp](https://img.shields.io/badge/Warp-1d2021?style=flat-square&logo=warp&logoColor=8ec07c)](https://www.warp.dev/)
 
-`.zshrc` preserves the portable parts of the current setup: Oh My Zsh Git/web-search plugins, autosuggestions, syntax highlighting, NVM, Git/Python/navigation aliases, fzf colors/previews, zoxide, and the active Starship prompt. Starship remains useful in other terminals even though Warp currently uses its native prompt (`honor_ps1 = false`). Powerlevel10k is not installed.
+### 🎨 Design & Creative
 
-Work/customer-specific helpers, internal endpoints, cloud account identifiers, personal vault/project paths, and credential assignments are intentionally excluded. Keep those in `~/.zshrc.local`; use `setup/zshrc.local.example` as a starting point. `~/.zprofile.local` is also supported. These files are ignored by Git. Optional aliases activate only when their tools are already present; Go, Terraform, Neovim, and Claude Code are not silently added as extra applications.
+[![Screen Studio](https://img.shields.io/badge/Screen_Studio-1d2021?style=flat-square&logo=apple&logoColor=fe8019)](https://screen.studio/)
+[![MOTIV Mix](https://img.shields.io/badge/MOTIV_Mix-1d2021?style=flat-square&logo=shure&logoColor=ebdbb2)](https://www.shure.com/en-US/products/software/motiv-mix)
+[![Affinity](https://img.shields.io/badge/Affinity-1d2021?style=flat-square&logo=affinity&logoColor=8ec07c)](https://www.affinity.studio/)
+[![Figma](https://img.shields.io/badge/Figma-1d2021?style=flat-square&logo=figma&logoColor=d3869b)](https://www.figma.com/)
 
-Files are **copied**, not symlinked. Editing a live config cannot accidentally edit the public repository. When updating the repo later, copy only reviewed changes back; never recursively copy your home directory or app support folders.
+### 📝 Writing & Notes
 
-## Warp
+[![Obsidian](https://img.shields.io/badge/Obsidian-1d2021?style=flat-square&logo=obsidian&logoColor=d3869b)](https://obsidian.md/)
 
-`warp/` captures the current portable settings, custom keybindings, custom theme, and its full-resolution background image. Text/EXIF metadata is stripped from the PNG without changing its pixel data. `font-0xproto-nerd-font` and Hack are installed to match the terminal/AI fonts. The custom theme's absolute path is rendered for the new user's home at install time.
+### 🌎 Browsers
 
-The existing single terminal tab, agent startup tab, and two-tab launch layout are represented without personal machine paths. The startup tab opens `~/Desktop/PARA`. Settings include the current appearance, native prompt selection, agent permissions/denylist, privacy/redaction rules, notifications, and settings-sync preference. Settings Sync can subsequently reconcile these with your signed-in account.
+[![Chrome](https://img.shields.io/badge/Chrome-1d2021?style=flat-square&logo=googlechrome&logoColor=fabd2f)](https://www.google.com/chrome/)
 
-**Intentionally excluded:** authentication, MCP server credentials, histories, conversations, session databases, caches, backups, cloud/account data, and project-specific agent skills. Those are not safe public dotfiles. Sign in again and configure private integrations locally. Existing unrelated Warp themes/layouts are not deleted. The legacy `warp-themes/` collection remains in the repo but is no longer linked wholesale.
+### 💬 AI & Communication
 
-Only redistribute images/fonts you have rights to share. Berkeley Mono is not bundled; VS Code keeps it first in its font list and falls back to the installed 0xProto Nerd Font Mono and system monospace fonts.
+[![Claude](https://img.shields.io/badge/Claude-1d2021?style=flat-square&logo=anthropic&logoColor=d3869b)](https://claude.ai/)
+[![Slack](https://img.shields.io/badge/Slack-1d2021?style=flat-square&logo=slack&logoColor=8ec07c)](https://slack.com/)
+[![Zoom](https://img.shields.io/badge/Zoom-1d2021?style=flat-square&logo=zoom&logoColor=83a598)](https://zoom.us/)
 
-## VS Code
 
-`vscode/settings.json`, `vscode/keybindings.json`, and `vscode/snippets/` restore the reviewed current preferences and global snippets. The extension list is curated for development, rather than exporting all historical extensions. Temporary Postman instruction paths, a machine-specific Python interpreter, the old terminal environment injection, and obsolete extension/model settings are omitted. Extensions' credential storage, profiles' private state, workspace data, and history are not copied. Sign in to extensions separately.
+---
 
-## Git identity and signing
+## 🤓 CLI Tools
 
-Shared `.gitconfig` contains no personal identity or signing-key identifier. It includes `~/.gitconfig.local`, which is never tracked. On an existing Mac, prior Git settings are migrated to that private file if it does not already exist. An existing local override is kept unchanged. Original replaced files are backed up. On a fresh Mac, setup prompts for name/email in an interactive terminal; otherwise copy `setup/gitconfig.local.example` to `~/.gitconfig.local` and edit it.
+[![eza](https://img.shields.io/badge/eza-1d2021?style=flat-square&logo=github&logoColor=fabd2f)](https://github.com/eza-community/eza)
+[![Git LFS](https://img.shields.io/badge/Git_LFS-1d2021?style=flat-square&logo=git&logoColor=fe8019)](https://git-lfs.com/)
+[![GnuPG](https://img.shields.io/badge/GnuPG-1d2021?style=flat-square&logo=gnupg&logoColor=8ec07c)](https://gnupg.org/)
+[![Python](https://img.shields.io/badge/Python-1d2021?style=flat-square&logo=python&logoColor=fabd2f)](https://www.python.org/)
+[![bat](https://img.shields.io/badge/bat-1d2021?style=flat-square&logo=github&logoColor=fabd2f)](https://github.com/sharkdp/bat)
+[![fd](https://img.shields.io/badge/fd-1d2021?style=flat-square&logo=github&logoColor=8ec07c)](https://github.com/sharkdp/fd)
+[![fzf](https://img.shields.io/badge/fzf-1d2021?style=flat-square&logo=github&logoColor=d3869b)](https://github.com/junegunn/fzf)
+[![GitHub CLI](https://img.shields.io/badge/gh-1d2021?style=flat-square&logo=github&logoColor=ebdbb2)](https://cli.github.com/)
+[![Git](https://img.shields.io/badge/git-1d2021?style=flat-square&logo=git&logoColor=fe8019)](https://git-scm.com/)
+[![nvm](https://img.shields.io/badge/nvm-1d2021?style=flat-square&logo=nodedotjs&logoColor=b8bb26)](https://github.com/nvm-sh/nvm)
+[![ripgrep](https://img.shields.io/badge/ripgrep-1d2021?style=flat-square&logo=github&logoColor=8ec07c)](https://github.com/BurntSushi/ripgrep)
+[![Starship](https://img.shields.io/badge/starship-1d2021?style=flat-square&logo=starship&logoColor=fabd2f)](https://starship.rs/)
+[![tree](https://img.shields.io/badge/tree-1d2021?style=flat-square&logo=gnubash&logoColor=8ec07c)](https://linux.die.net/man/1/tree)
+[![zoxide](https://img.shields.io/badge/zoxide-1d2021?style=flat-square&logo=github&logoColor=fabd2f)](https://github.com/ajeetdsouza/zoxide)
+[![Zsh](https://img.shields.io/badge/zsh-1d2021?style=flat-square&logo=zsh&logoColor=b8bb26)](https://www.zsh.org/)
 
-Choose an email suitable for **public commit metadata**, such as your GitHub noreply address. Keeping the config private does not hide the author identity embedded in commits.
+---
 
-A **public signing key or fingerprint is safe to publish**. A **private signing key is never safe to publish**. The setup deliberately keeps even the fingerprint local and does not turn on signing for an unprovisioned machine. Generate/import a key locally, register its public part with GitHub, and enable signing in the private config using the commented GPG/SSH examples. Keys are never generated, copied, or uploaded automatically.
+## ⌨️ Hardware & Other
 
-## PARA
+[![Kinesis 360](https://img.shields.io/badge/Kinesis_Advantage_360-1d2021?style=flat-square&logo=kinesis&logoColor=8ec07c)](https://kinesis-ergo.com/keyboards/advantage360/)
+[![Bambu Lab](https://img.shields.io/badge/Bambu_P2S-1d2021?style=flat-square&logo=bambulab&logoColor=b8bb26)](https://bambulab.com/)
+[![Raspberry Pi](https://img.shields.io/badge/Raspberry_Pi-1d2021?style=flat-square&logo=raspberrypi&logoColor=fb4934)](https://www.raspberrypi.com/software/)
+[![Shure MV7+](https://img.shields.io/badge/Shure_MV7+-1d2021?style=flat-square&logo=shure&logoColor=ebdbb2)](https://www.shure.com/en-US/microphones/mv7)
+[![Spotify](https://img.shields.io/badge/Spotify-1d2021?style=flat-square&logo=spotify&logoColor=b8bb26)](https://www.spotify.com/)
 
-Setup creates these directories under `~/Desktop/PARA` without renaming or removing any existing folders:
+---
 
-- `0-index/`
-- `1-projects/`
-- `2-areas/`
-- `3-resources/`
-- `4-archive/`
-  - `completed-projects/`
-  - `finished-tasks/`
-  - `inactive-area/`
-  - `prior-interest/`
+<div align="center">
 
-These directories are empty on a fresh install. Existing differently named PARA folders remain untouched; migrate their contents manually if desired.
+<img src="./images/keyboard.png" alt="Kinesis Advantage 360" width="600" />
 
-## Backups and public safety
+_Built with ☕_
 
-Changed files are backed up under `~/.local/state/dotfiles/backups/<timestamp>/`, **outside this repository**, with a private backup root. Existing `.zshrc.local` and `.gitconfig.local` are left alone. To undo a config replacement, close the affected app and restore the corresponding file from that backup. Software installation and Node defaults are not automatically rolled back.
-
-Before publishing any changes, review the diff and run the heuristic scan:
-
-```sh
-python3 setup/check-public.py --history
-git diff --check
-```
-
-The checker reports locations, never secret values. It detects common credential formats, literal credential assignments, and machine-specific home paths; it is not a comprehensive secret scanner or a guarantee of safety. Use an independent scanner such as Gitleaks as an additional check. Ignore rules do not protect secrets in already-tracked files. If a real credential ever entered public history, revoke/rotate it; deleting its current line does not erase the old commits.
-
-Legacy Neovim/window-manager/terminal configs are retained for reference but are not installed by default.
-
-## Offline validation
-
-```sh
-python3 setup/test_setup.py
-python3 setup/check-public.py --history
-bash -n install.sh
-bash -n setup/bootstrap.sh
-zsh -n .zshrc
-zsh -n .zprofile
-./install.sh --dry-run --non-interactive
-```
-
-Tests modify only temporary homes. Python 3.11+ additionally validates TOML with the standard library. They cover fresh install, rerun idempotence, backups, private overrides, Git signing/identity migration, symlink handling, path escaping, source preflight, and the exact PARA layout. A complete fresh-Mac software installation still requires testing on a disposable Mac/VM and accepting app-specific prompts.
+</div>
