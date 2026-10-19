@@ -74,7 +74,7 @@ if [ "$CONFIG_ONLY" -eq 0 ]; then
         fi
     fi
     printf '\n2. Curated applications, fonts, and shell tools\n'
-    run brew bundle install --no-upgrade --file="$ROOT/Brewfile"
+    run brew bundle install --verbose --no-upgrade --file="$ROOT/Brewfile"
     printf '\n3. Oh My Zsh, upstream NVM, and Node LTS\n'
     if [ ! -e "$HOME/.oh-my-zsh" ]; then
         run git clone --depth=1 https://github.com/ohmyzsh/ohmyzsh.git "$HOME/.oh-my-zsh"
@@ -125,7 +125,7 @@ if [ "$CONFIG_ONLY" -eq 0 ] && [ "$EXTENSIONS" -eq 1 ]; then
 fi
 if [ "$CONFIG_ONLY" -eq 0 ] && [ "$APP_STORE" -eq 1 ]; then
     printf '\n6. Purchased App Store apps (sign in to the App Store first)\n'
-    run brew bundle install --no-upgrade --file="$ROOT/setup/Brewfile.app-store"
+    run brew bundle install --verbose --no-upgrade --file="$ROOT/setup/Brewfile.app-store"
 fi
 printf '\nSetup phases complete. Remaining interactive steps:\n'
 printf '%s\n' \
