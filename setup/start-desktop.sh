@@ -2,11 +2,14 @@
 # Re-run after granting permissions; does not install or copy configuration.
 set -euo pipefail
 DRY_RUN=0
-case "${1:-}" in
-    --dry-run) DRY_RUN=1 ;;
-    "") ;;
-    *) printf 'Usage: bash setup/start-desktop.sh [--dry-run]\n' >&2; exit 2 ;;
-esac
+KEEP_MENU_BAR=0
+for arg in "$@"; do
+    case "$arg" in
+        --dry-run) DRY_RUN=1 ;;
+        --keep-menu-bar) KEEP_MENU_BAR=1 ;;
+        *) printf 'Usage: bash setup/start-desktop.sh [--dry-run] [--keep-menu-bar]\n' >&2; exit 2 ;;
+    esac
+done
 [ "$(uname -s)" = Darwin ] || { printf 'macOS only.\n' >&2; exit 1; }
 [ "$(id -u)" -ne 0 ] || { printf 'Run as your normal user, not sudo.\n' >&2; exit 1; }
 export PATH="$HOME/.local/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/usr/local/sbin:$PATH"
@@ -48,15 +51,36 @@ fi
 # Homebrew services run as this user and register for the user's next login.
 run brew services restart felixkratz/formulae/borders
 run brew services restart felixkratz/formulae/sketchybar
-if [ "$DRY_RUN" -eq 0 ] && [ "$ready" -eq 1 ]; then
-    # Allow launchd to finish starting the bar before its initial refresh.
+bar_ready=0
+if [ "$DRY_RUN" -eq 1 ]; then
+    run sketchybar --reload
+    run sketchybar --trigger aerospace_workspace_change
+    if [ "$KEEP_MENU_BAR" -eq 0 ]; then
+        run defaults write NSGlobalDomain _HIHideMenuBar -bool true
+        run killall SystemUIServer
+    fi
+else
+    # Allow launchd to finish starting the bar before reloading its full config.
     for attempt in 1 2 3 4 5; do
         if sketchybar --query bar >/dev/null 2>&1; then
-            run sketchybar --trigger aerospace_workspace_change
+            if run sketchybar --reload; then
+                bar_ready=1
+            fi
+            if [ "$ready" -eq 1 ]; then
+                run sketchybar --trigger aerospace_workspace_change
+            fi
             break
         fi
         sleep 1
     done
+fi
+if [ "$DRY_RUN" -eq 0 ] && [ "$bar_ready" -eq 1 ] && [ "$KEEP_MENU_BAR" -eq 0 ]; then
+    run defaults write NSGlobalDomain _HIHideMenuBar -bool true
+    if ! run killall SystemUIServer; then
+        printf 'Menu-bar auto-hide saved; log out/in if the change is not visible yet.\n'
+    fi
+elif [ "$DRY_RUN" -eq 0 ] && [ "$bar_ready" -eq 0 ]; then
+    printf 'SketchyBar is not responding; the native menu-bar preference was left unchanged.\n'
 fi
 if [ "$DRY_RUN" -eq 0 ] && ! command -v aerospace >/dev/null 2>&1; then
     printf '%s\n' \
@@ -73,6 +97,6 @@ printf '%s\n' \
     'macOS permissions cannot be granted automatically:' \
     '- Allow AeroSpace in System Settings > Privacy & Security > Accessibility.' \
     '- Approve any Automation/Screen Recording prompts for bar features as needed.' \
-    '- Set the macOS menu bar to automatically hide if you want only SketchyBar visible.' \
+    '- Native menu-bar auto-hide is enabled after SketchyBar responds, unless --keep-menu-bar is used.' \
     '- Enable requested login items; AeroSpace config enables start-at-login.' \
     'No system services or macOS security protections were disabled.'

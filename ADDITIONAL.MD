@@ -46,6 +46,7 @@ This app protection does **not** disable configuration restoration: the shell/Wa
 - `./install.sh --desktop-only`: skip the main GUI app bundle and VS Code extension stage; install shell/desktop dependencies, set up Oh My Zsh/NVM/Node LTS, copy base and desktop configs, then start desktop services.
 - `./install.sh --config-only --desktop`: copy base and desktop configs without installing tools or starting services.
 - `./install.sh --desktop-only --no-start`: install tools and copy configs, but defer service startup.
+- `./install.sh --desktop-only --keep-menu-bar`: start desktop tools without changing the native menu-bar preference.
 
 Options can be combined. Rerun after fixing a failed step; identical config files are left unchanged. This is a resumable bootstrap, not a transactional system image or version-locked package snapshot. Never use `brew bundle dump --force` to replace the curated Brewfile with every app on a machine.
 
@@ -132,9 +133,11 @@ Existing AeroSpace app bundles are left untouched. A manually installed AeroSpac
 
 Config copies go into `~/.config/aerospace`, `~/.config/sketchybar`, and `~/.config/borders`. Scripts retain executable permissions, backup/example files are excluded, and the repo's matching app-icon font is installed into `~/Library/Fonts`. An existing 0xProto Nerd Font file causes the font cask to be skipped to avoid manual-install collisions; if only some styles are installed, complete that font installation separately. An existing `~/.aerospace.toml` is moved into the private backup directory to avoid AeroSpace's conflicting-config-locations error. Desktop-directory symlinks are backed up and replaced with real directories rather than modifying an old checkout.
 
-Once configs are copied, setup opens/reloads AeroSpace and restarts the user-level Homebrew borders/SketchyBar services (which run at future logins). To retry startup without reinstalling or copying anything, run `bash setup/start-desktop.sh`. AeroSpace is configured to start at login.
+Once configs are copied, setup opens/reloads AeroSpace and restarts the user-level Homebrew borders/SketchyBar services (which run at future logins). It waits for the bar to respond, reloads the full bar configuration, and refreshes its AeroSpace workspace state. Workspace initialization runs separately, so a slow AeroSpace startup cannot stop the clock, Spotify, or event listener from loading. To retry startup without reinstalling or copying anything, run `bash setup/start-desktop.sh`. AeroSpace is configured to start at login.
 
-macOS still requires you to approve AeroSpace's Accessibility access and any requested Automation/Screen Recording permissions. To avoid two menu bars, set the macOS menu bar to automatically hide. The setup does not change system display/Spaces preferences, unload macOS services, remove quarantine flags, or grant permissions automatically. JankyBorders requires macOS 14 or newer. Desktop appearance, multi-monitor behavior, and actual permissions need verification on the new Mac.
+After SketchyBar responds and accepts a reload, desktop startup enables native menu-bar auto-hide (`defaults write NSGlobalDomain _HIHideMenuBar -bool true`) and restarts the user's SystemUIServer so the preference takes effect. If the bar does not respond, this preference is left unchanged. Use `--keep-menu-bar` on the installer or startup helper to skip this change. That option preserves the current preference; to show the native menu bar again, set `_HIHideMenuBar` to `false` and restart SystemUIServer, or change the menu-bar auto-hide setting in System Settings.
+
+macOS still requires you to approve AeroSpace's Accessibility access and any requested Automation/Screen Recording permissions. The setup does not change display/Spaces preferences, unload system services, remove quarantine flags, or grant permissions automatically. JankyBorders requires macOS 14 or newer. Desktop appearance, multi-monitor behavior, and actual permissions need verification on the new Mac.
 
 ## Offline validation
 

@@ -87,8 +87,11 @@ for i in {1..9}; do
              --set aerospace.workspace.$i drawing=off
 done
 
-# Now run aerospace.sh to set initial state
-source "$ITEM_DIR/aerospace.sh"
+# Isolate workspace initialization: its early exit while AeroSpace starts must
+# never abort the rest of the bar (clock, Spotify, and event listener).
+if ! /bin/bash "$ITEM_DIR/aerospace.sh"; then
+  printf 'AeroSpace is not ready; the remaining bar items will still load.\n' >&2
+fi
 
 # Add current app right after aerospace workspaces
 sketchybar --add item front_app left \

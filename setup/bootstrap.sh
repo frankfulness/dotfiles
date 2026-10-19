@@ -10,6 +10,7 @@ EXTENSIONS=1
 DESKTOP=0
 DESKTOP_ONLY=0
 START_DESKTOP=1
+KEEP_MENU_BAR=0
 
 usage() {
     printf '%s\n' "Usage: ./install.sh [options]" \
@@ -21,6 +22,7 @@ usage() {
         "  --desktop          Also install/configure AeroSpace, SketchyBar, and JankyBorders" \
         "  --desktop-only     Set up shell, desktop, and configs; skip the main GUI app bundle" \
         "  --no-start         Copy desktop configs without starting desktop services" \
+        "  --keep-menu-bar    Do not change macOS menu-bar auto-hide during desktop startup" \
         "  --help             Show this help"
 }
 for arg in "$@"; do
@@ -33,6 +35,7 @@ for arg in "$@"; do
         --desktop) DESKTOP=1 ;;
         --desktop-only) DESKTOP=1; DESKTOP_ONLY=1; EXTENSIONS=0 ;;
         --no-start) START_DESKTOP=0 ;;
+        --keep-menu-bar) KEEP_MENU_BAR=1 ;;
         --help|-h) usage; exit 0 ;;
         *) printf 'Unknown option: %s\n' "$arg" >&2; usage >&2; exit 2 ;;
     esac
@@ -166,11 +169,10 @@ printf '\n7. Remaining Git, editor, and optional desktop configuration\n'
 configure_phase remaining
 if [ "$DESKTOP" -eq 1 ] && [ "$CONFIG_ONLY" -eq 0 ] && [ "$START_DESKTOP" -eq 1 ]; then
     printf '\nStart/reload AeroSpace, JankyBorders, and SketchyBar\n'
-    if [ "$DRY_RUN" -eq 1 ]; then
-        /bin/bash "$ROOT/setup/start-desktop.sh" --dry-run
-    else
-        /bin/bash "$ROOT/setup/start-desktop.sh"
-    fi
+    startup_args=()
+    [ "$DRY_RUN" -eq 0 ] || startup_args+=(--dry-run)
+    [ "$KEEP_MENU_BAR" -eq 0 ] || startup_args+=(--keep-menu-bar)
+    /bin/bash "$ROOT/setup/start-desktop.sh" ${startup_args[@]+"${startup_args[@]}"}
 fi
 if [ "$CONFIG_ONLY" -eq 0 ] && [ "$EXTENSIONS" -eq 1 ]; then
     printf '\n8. VS Code extensions\n'

@@ -116,7 +116,8 @@ class DesktopTests(unittest.TestCase):
             self.assertLess(result.stdout.index("Copy .zshrc"), result.stdout.index("Homebrew shell tools"))
             self.assertLess(result.stdout.index("Warp customization"), result.stdout.index("Desktop dependencies"))
 
-    def run_stubbed_installer(self, home, trust_available=True, fail_shell=False, desktop_only=True):
+    def run_stubbed_installer(self, home, trust_available=True, fail_shell=False,
+                             desktop_only=True, keep_menu_bar=False, bar_available=True):
         bin_dir = home / ".local/bin"
         bin_dir.mkdir(parents=True)
         log = home / "commands.log"
@@ -144,8 +145,14 @@ fi
 printf 'aerospace %s\\n' "$*" >> "$TEST_LOG"
 test -f "$HOME/.config/aerospace/aerospace.toml" || exit 94
 ''')
-        stub("sketchybar", 'printf "sketchybar %s\\n" "$*" >> "$TEST_LOG"\n')
+        stub("sketchybar", '''
+printf 'sketchybar %s\\n' "$*" >> "$TEST_LOG"
+if [ "$1" = --query ] && [ "$TEST_BAR_AVAILABLE" = 0 ]; then exit 1; fi
+''')
+        stub("sleep", "exit 0\n")
         stub("borders", "exit 0\n")
+        stub("defaults", 'printf "defaults %s\\n" "$*" >> "$TEST_LOG"\n')
+        stub("killall", 'printf "killall %s\\n" "$*" >> "$TEST_LOG"\n')
         (home / ".oh-my-zsh").mkdir()
         (home / ".nvm").mkdir()
         (home / ".nvm/nvm.sh").write_text(
@@ -156,12 +163,15 @@ test -f "$HOME/.config/aerospace/aerospace.toml" || exit 94
             PATH=str(bin_dir) + ":" + os.environ["PATH"], TEST_LOG=str(log),
             TEST_TRUST_STATUS="0" if trust_available else "1",
             TEST_FAIL_SHELL="1" if fail_shell else "0",
+            TEST_BAR_AVAILABLE="1" if bar_available else "0",
             PYTHONDONTWRITEBYTECODE="1",
         )
         command = ["/bin/bash", str(configure.ROOT / "install.sh"),
                    "--non-interactive", "--skip-extensions"]
         if desktop_only:
             command.append("--desktop-only")
+        if keep_menu_bar:
+            command.append("--keep-menu-bar")
         result = subprocess.run(
             command,
             env=env, text=True, capture_output=True,
@@ -182,6 +192,52 @@ test -f "$HOME/.config/aerospace/aerospace.toml" || exit 94
                             log.index("services restart felixkratz/formulae/sketchybar"))
             self.assertNotIn("brew trust felixkratz/formulae", log)
             self.assertNotIn("Brewfile.apps", log)
+            self.assertLess(log.index("sketchybar --reload"),
+                            log.index("defaults write NSGlobalDomain _HIHideMenuBar -bool true"))
+            self.assertIn("killall SystemUIServer", log)
+
+    def test_keep_menu_bar_does_not_change_preferences(self):
+        with tempfile.TemporaryDirectory() as temp:
+            result, log = self.run_stubbed_installer(Path(temp), keep_menu_bar=True)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertIn("sketchybar --reload", log)
+            self.assertNotIn("defaults write", log)
+            self.assertNotIn("killall SystemUIServer", log)
+
+    def test_unresponsive_bar_leaves_native_menu_bar_unchanged(self):
+        with tempfile.TemporaryDirectory() as temp:
+            result, log = self.run_stubbed_installer(Path(temp), bar_available=False)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertIn("native menu-bar preference was left unchanged", result.stdout)
+            self.assertNotIn("defaults write", log)
+            self.assertNotIn("killall SystemUIServer", log)
+
+    def test_workspace_startup_failure_does_not_abort_bar(self):
+        with tempfile.TemporaryDirectory() as temp:
+            home = Path(temp)
+            bin_dir = home / ".local/bin"
+            bin_dir.mkdir(parents=True)
+            log = home / "bar.log"
+            for name, body in (
+                ("aerospace", "exit 1\n"),
+                ("sketchybar", 'printf "%s\\n" "$*" >> "$TEST_LOG"\n'),
+            ):
+                script = bin_dir / name
+                script.write_text("#!/bin/bash\n" + body)
+                script.chmod(0o755)
+            result = subprocess.run(
+                ["/bin/bash", str(configure.ROOT / "sketchybar/sketchybarrc")],
+                env=dict(os.environ, HOME=str(home),
+                         CONFIG_DIR=str(configure.ROOT / "sketchybar"),
+                         TEST_LOG=str(log)),
+                capture_output=True, text=True, timeout=15,
+            )
+            self.assertEqual(result.returncode, 0, result.stderr)
+            commands = log.read_text()
+            for name in ("front_app", "spotify.anchor", "dato", "mic", "aerospace_listener"):
+                self.assertIn("--add item " + name, commands)
+            self.assertIn("--update", commands)
+            self.assertIn("sketchybar configuration loaded", result.stdout)
 
     def test_default_install_orders_shell_then_warp_then_apps(self):
         with tempfile.TemporaryDirectory() as temp:
