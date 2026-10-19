@@ -1,214 +1,122 @@
-<div align="center">
+# Mac dotfiles
 
-# 🛠️ Dotfiles
+A focused, public-safe setup for a fresh Mac: Zsh + Oh My Zsh + Starship, a customized Warp terminal, VS Code, Node through NVM, Git, and a curated application list.
 
-![macOS](https://img.shields.io/badge/macOS-1d2021?style=for-the-badge&logo=apple&logoColor=ebdbb2)
-![Neovim](https://img.shields.io/badge/Neovim-1d2021?style=for-the-badge&logo=neovim&logoColor=b8bb26)
-![Zsh](https://img.shields.io/badge/Zsh-1d2021?style=for-the-badge&logo=zsh&logoColor=fe8019)
-![Lua](https://img.shields.io/badge/Lua-1d2021?style=for-the-badge&logo=lua&logoColor=83a598)
+## Fresh Mac
 
-_Velocity • Discoverability • Intelligence • Extensibility_
+Use the built-in Terminal to get started. If Git is unavailable, run `xcode-select --install`, complete Apple's installer, and then continue. Alternatively, download and extract this repository's ZIP from GitHub.
 
-<img src="./images/books.jpg" alt="Ireland Dublin Trinity College Ancient Library" width="800" />
-
-**My macOS development environment — crafted for speed and aesthetics.**
-
-</div>
-
----
-
-## 🏛️ Stack Overview
-
-| Category              | Tools                                                                                                                     |
-| :-------------------- | :------------------------------------------------------------------------------------------------------------------------ |
-| **Shell**             | [Zsh](https://www.zsh.org/) + [Oh My Zsh](https://ohmyz.sh/) + [Powerlevel10k](https://github.com/romkatv/powerlevel10k)  |
-| **Terminal**          | [Kitty](https://sw.kovidgoyal.net/kitty/) • [Warp](https://www.warp.dev/)                                                 |
-| **Editor**            | [Neovim](https://neovim.io/) ([LazyVim](https://www.lazyvim.org/)) • [VSCode](https://code.visualstudio.com/)             |
-| **Window Management** | [AeroSpace](https://github.com/nikitabobko/AeroSpace) • [JankyBorders](https://github.com/FelixKratz/JankyBorders)        |
-| **Menu Bar**          | [SketchyBar](https://github.com/FelixKratz/SketchyBar)                                                                    |
-| **Prompt**            | [Starship](https://starship.rs/)                                                                                          |
-| **Git**               | [Git](https://git-scm.com/) + [GitHub CLI](https://cli.github.com/) + [LazyGit](https://github.com/jesseduffield/lazygit) |
-| **Prompt**            | [Starship](https://starship.rs/)                                                                                          |
-| **Note System**       | [Obsidian](https://obsidian.md/)                                                                                          |
-
----
-
-## 🚀 Installation
-
-```bash
-# Clone the repo
-git clone https://github.com/YOUR_USERNAME/dotfiles.git ~/.config/dotfiles
-
-# Run the install script
-cd ~/.config/dotfiles
+```sh
+git clone https://github.com/frankfulness/dotfiles.git "$HOME/.config/dotfiles"
+cd "$HOME/.config/dotfiles"
+./install.sh --dry-run
 ./install.sh
 ```
 
-<details>
-<summary>📦 What the script does</summary>
+The installer must run as your normal user, **not** with `sudo`. Homebrew or individual installers may request administrator approval. Quit Warp and VS Code before restoring their settings; reopen them afterward. If the Command Line Tools are missing, setup opens Apple's installer and asks you to rerun after it completes.
 
-1. Install [Homebrew](https://brew.sh/) (if needed)
-2. Install all packages from the Brewfile
-3. Symlink all configs to the correct locations
-4. Install Oh My Zsh and Powerlevel10k
+### Installation order
 
-</details>
+1. Apple Command Line Tools and architecture-appropriate Homebrew.
+2. Curated applications, Git/tools, and fonts from `Brewfile`.
+3. Oh My Zsh, upstream NVM (pinned to v0.40.8 for a new install), and the current Node LTS. Existing NVM installs are reused, not overwritten; Node's default becomes `lts/*`.
+4. Copy reviewed configs, preserve private Git settings, and create the PARA folders.
+5. Install the reviewed VS Code extensions from `vscode/extensions.txt`.
+6. Optionally restore purchased App Store apps.
 
-<details>
-<summary>🔧 VSCode Setup</summary>
+Homebrew comes before the apps because it installs them. Setup does not remove applications, clean Homebrew packages, start background services, import credentials, or silently grant permissions. Existing Homebrew packages are not upgraded by this bootstrap. It does not install Homebrew Node, Powerlevel10k, extra terminals, window managers, or the legacy repository's entire tool collection.
 
-```bash
-# Copy settings
-cp ~/.config/dotfiles/vscode/settings.json ~/Library/Application\ Support/Code/User/
-cp ~/.config/dotfiles/vscode/keybindings.json ~/Library/Application\ Support/Code/User/
+### Options
 
-# Install extensions
-cat ~/.config/dotfiles/vscode/extensions.txt | xargs -L 1 code --install-extension
+- `./install.sh --dry-run`: preview; no downloads, application installs, or configuration changes.
+- `./install.sh --config-only`: restore configs and PARA only; requires Python 3 already installed.
+- `./install.sh --app-store`: full setup plus purchased App Store apps.
+- `./install.sh --non-interactive`: skip Git identity prompts; configure identity separately.
+- `./install.sh --skip-extensions`: omit VS Code extension installation.
+
+Options can be combined. Rerun after fixing a failed step; identical config files are left unchanged. This is a resumable bootstrap, not a transactional system image or version-locked package snapshot. Never use `brew bundle dump --force` to replace the curated Brewfile with every app on a machine.
+
+## Applications
+
+**Homebrew:** Warp, Claude Desktop, Docker Desktop, Figma, Slack, Zoom, Obsidian, Google Chrome, Visual Studio Code, Bruno, Clipy, Screen Studio, Raycast, Affinity, and Spotify.
+
+**App Store:** [Dato](https://apps.apple.com/app/id1470584107), [Cursor Pro](https://apps.apple.com/app/id1447043133), and [Keystroke Pro](https://apps.apple.com/app/id1572206224). Sign in to the App Store first and purchase/claim the apps with that Apple Account. `--app-store` uses `mas` to restore them; it cannot purchase apps or bypass account prompts. Cursor Pro is the pointer-highlighting utility, not the Cursor editor.
+
+**Vendor install:** [Shure MOTIV Mix](https://www.shure.com/en-US/products/software/motiv-mix) for the MV7+. Download the current macOS installer from Shure, install it, and approve microphone/audio-driver permissions. The Homebrew `shureplus-motiv` package is a different, older product and is intentionally not installed. No unverified download URL or unattended driver installer is used.
+
+After installation, open Docker Desktop to complete its first-run setup. Sign in to apps and activate paid licenses, including Screen Studio/Affinity if required. Accessibility, Screen Recording, microphone access, browser defaults, and login items require explicit user action. No app logins, license files, or app databases are stored here.
+
+## Shell and private overrides
+
+`.zshrc` preserves the portable parts of the current setup: Oh My Zsh Git/web-search plugins, autosuggestions, syntax highlighting, NVM, Git/Python/navigation aliases, fzf colors/previews, zoxide, and the active Starship prompt. Starship remains useful in other terminals even though Warp currently uses its native prompt (`honor_ps1 = false`). Powerlevel10k is not installed.
+
+Work/customer-specific helpers, internal endpoints, cloud account identifiers, personal vault/project paths, and credential assignments are intentionally excluded. Keep those in `~/.zshrc.local`; use `setup/zshrc.local.example` as a starting point. `~/.zprofile.local` is also supported. These files are ignored by Git. Optional aliases activate only when their tools are already present; Go, Terraform, Neovim, and Claude Code are not silently added as extra applications.
+
+Files are **copied**, not symlinked. Editing a live config cannot accidentally edit the public repository. When updating the repo later, copy only reviewed changes back; never recursively copy your home directory or app support folders.
+
+## Warp
+
+`warp/` captures the current portable settings, custom keybindings, custom theme, and its full-resolution background image. Text/EXIF metadata is stripped from the PNG without changing its pixel data. `font-0xproto-nerd-font` and Hack are installed to match the terminal/AI fonts. The custom theme's absolute path is rendered for the new user's home at install time.
+
+The existing single terminal tab, agent startup tab, and two-tab launch layout are represented without personal machine paths. The startup tab opens `~/Desktop/PARA`. Settings include the current appearance, native prompt selection, agent permissions/denylist, privacy/redaction rules, notifications, and settings-sync preference. Settings Sync can subsequently reconcile these with your signed-in account.
+
+**Intentionally excluded:** authentication, MCP server credentials, histories, conversations, session databases, caches, backups, cloud/account data, and project-specific agent skills. Those are not safe public dotfiles. Sign in again and configure private integrations locally. Existing unrelated Warp themes/layouts are not deleted. The legacy `warp-themes/` collection remains in the repo but is no longer linked wholesale.
+
+Only redistribute images/fonts you have rights to share. Berkeley Mono is not bundled; VS Code keeps it first in its font list and falls back to the installed 0xProto Nerd Font Mono and system monospace fonts.
+
+## VS Code
+
+`vscode/settings.json`, `vscode/keybindings.json`, and `vscode/snippets/` restore the reviewed current preferences and global snippets. The extension list is curated for development, rather than exporting all historical extensions. Temporary Postman instruction paths, a machine-specific Python interpreter, the old terminal environment injection, and obsolete extension/model settings are omitted. Extensions' credential storage, profiles' private state, workspace data, and history are not copied. Sign in to extensions separately.
+
+## Git identity and signing
+
+Shared `.gitconfig` contains no personal identity or signing-key identifier. It includes `~/.gitconfig.local`, which is never tracked. On an existing Mac, prior Git settings are migrated to that private file if it does not already exist. An existing local override is kept unchanged. Original replaced files are backed up. On a fresh Mac, setup prompts for name/email in an interactive terminal; otherwise copy `setup/gitconfig.local.example` to `~/.gitconfig.local` and edit it.
+
+Choose an email suitable for **public commit metadata**, such as your GitHub noreply address. Keeping the config private does not hide the author identity embedded in commits.
+
+A **public signing key or fingerprint is safe to publish**. A **private signing key is never safe to publish**. The setup deliberately keeps even the fingerprint local and does not turn on signing for an unprovisioned machine. Generate/import a key locally, register its public part with GitHub, and enable signing in the private config using the commented GPG/SSH examples. Keys are never generated, copied, or uploaded automatically.
+
+## PARA
+
+Setup creates these directories under `~/Desktop/PARA` without renaming or removing any existing folders:
+
+- `0-index/`
+- `1-projects/`
+- `2-areas/`
+- `3-resources/`
+- `4-archive/`
+  - `completed-projects/`
+  - `finished-tasks/`
+  - `inactive-area/`
+  - `prior-interest/`
+
+These directories are empty on a fresh install. Existing differently named PARA folders remain untouched; migrate their contents manually if desired.
+
+## Backups and public safety
+
+Changed files are backed up under `~/.local/state/dotfiles/backups/<timestamp>/`, **outside this repository**, with a private backup root. Existing `.zshrc.local` and `.gitconfig.local` are left alone. To undo a config replacement, close the affected app and restore the corresponding file from that backup. Software installation and Node defaults are not automatically rolled back.
+
+Before publishing any changes, review the diff and run the heuristic scan:
+
+```sh
+python3 setup/check-public.py --history
+git diff --check
 ```
 
-</details>
+The checker reports locations, never secret values. It detects common credential formats, literal credential assignments, and machine-specific home paths; it is not a comprehensive secret scanner or a guarantee of safety. Use an independent scanner such as Gitleaks as an additional check. Ignore rules do not protect secrets in already-tracked files. If a real credential ever entered public history, revoke/rotate it; deleting its current line does not erase the old commits.
 
-<details>
-<summary>✅ Manual Steps After Install</summary>
+Legacy Neovim/window-manager/terminal configs are retained for reference but are not installed by default.
 
-1. Restart your terminal
-2. Start services:
-   ```bash
-   brew services start sketchybar
-   brew services start borders
-   ```
-3. Open AeroSpace to enable tiling
-4. Configure any app-specific settings
+## Offline validation
 
-</details>
-
-<details>
-<summary>🔄 Updating Brewfile</summary>
-
-```bash
-brew bundle dump --file=~/.config/dotfiles/Brewfile --force
+```sh
+python3 setup/test_setup.py
+python3 setup/check-public.py --history
+bash -n install.sh
+bash -n setup/bootstrap.sh
+zsh -n .zshrc
+zsh -n .zprofile
+./install.sh --dry-run --non-interactive
 ```
 
-</details>
-
----
-
-## 🖥️ Third-Party Apps
-
-### 🔧 Productivity & Utilities
-
-[![Clipy](https://img.shields.io/badge/Clipy-1d2021?style=flat-square&logo=apple&logoColor=8ec07c)](https://clipy-app.com/)
-[![Dato](https://img.shields.io/badge/Dato-1d2021?style=flat-square&logo=apple&logoColor=fabd2f)](https://sindresorhus.com/dato)
-[![DevCleaner](https://img.shields.io/badge/DevCleaner-1d2021?style=flat-square&logo=xcode&logoColor=83a598)](https://apps.apple.com/app/devcleaner-for-xcode/id1388020431)
-[![Flow](https://img.shields.io/badge/Flow-1d2021?style=flat-square&logo=apple&logoColor=fb4934)](https://flowapp.info/)
-[![f.lux](https://img.shields.io/badge/f.lux-1d2021?style=flat-square&logo=apple&logoColor=fe8019)](https://justgetflux.com/)
-[![Keyboard Maestro](https://img.shields.io/badge/Keyboard_Maestro-1d2021?style=flat-square&logo=apple&logoColor=b8bb26)](https://www.keyboardmaestro.com/)
-[![Keystroke Pro](https://img.shields.io/badge/Keystroke_Pro-1d2021?style=flat-square&logo=apple&logoColor=d3869b)](https://apps.apple.com/app/keystroke-pro/id1572206224)
-[![Magnet](https://img.shields.io/badge/Magnet-1d2021?style=flat-square&logo=apple&logoColor=8ec07c)](https://magnet.crowdcafe.com/)
-[![Mirror Magnet](https://img.shields.io/badge/Mirror_Magnet-1d2021?style=flat-square&logo=apple&logoColor=fabd2f)](https://apps.apple.com/app/mirror-magnet/id1563698880)
-[![Raycast](https://img.shields.io/badge/Raycast-1d2021?style=flat-square&logo=raycast&logoColor=fe8019)](https://www.raycast.com/)
-[![Theine](https://img.shields.io/badge/Theine-1d2021?style=flat-square&logo=apple&logoColor=83a598)](https://apps.apple.com/app/theine/id955848755)
-
-### 💻 Development
-
-[![Bruno](https://img.shields.io/badge/Bruno-1d2021?style=flat-square&logo=bruno&logoColor=fe8019)](https://www.usebruno.com/)
-[![Cursor](https://img.shields.io/badge/Cursor-1d2021?style=flat-square&logo=cursor&logoColor=ebdbb2)](https://cursor.sh/)
-[![Docker](https://img.shields.io/badge/Docker-1d2021?style=flat-square&logo=docker&logoColor=83a598)](https://www.docker.com/)
-[![Kitty](https://img.shields.io/badge/Kitty-1d2021?style=flat-square&logo=gnometerminal&logoColor=b8bb26)](https://sw.kovidgoyal.net/kitty/)
-[![PopSQL](https://img.shields.io/badge/PopSQL-1d2021?style=flat-square&logo=postgresql&logoColor=d3869b)](https://popsql.com/)
-[![Postman](https://img.shields.io/badge/Postman-1d2021?style=flat-square&logo=postman&logoColor=fe8019)](https://www.postman.com/)
-[![VSCode](https://img.shields.io/badge/VSCode-1d2021?style=flat-square&logo=visualstudiocode&logoColor=83a598)](https://code.visualstudio.com/)
-[![Warp](https://img.shields.io/badge/Warp-1d2021?style=flat-square&logo=warp&logoColor=8ec07c)](https://www.warp.dev/)
-[![Xcode](https://img.shields.io/badge/Xcode-1d2021?style=flat-square&logo=xcode&logoColor=83a598)](https://developer.apple.com/xcode/)
-
-### 🎨 Design & Creative
-
-[![Affinity](https://img.shields.io/badge/Affinity-1d2021?style=flat-square&logo=affinity&logoColor=8ec07c)](https://affinity.serif.com/)
-[![Blender](https://img.shields.io/badge/Blender-1d2021?style=flat-square&logo=blender&logoColor=fe8019)](https://www.blender.org/)
-[![Figma](https://img.shields.io/badge/Figma-1d2021?style=flat-square&logo=figma&logoColor=d3869b)](https://www.figma.com/)
-[![OBS](https://img.shields.io/badge/OBS-1d2021?style=flat-square&logo=obsstudio&logoColor=ebdbb2)](https://obsproject.com/)
-
-### 📝 Writing & Notes
-
-[![Notion](https://img.shields.io/badge/Notion-1d2021?style=flat-square&logo=notion&logoColor=ebdbb2)](https://www.notion.so/)
-[![Obsidian](https://img.shields.io/badge/Obsidian-1d2021?style=flat-square&logo=obsidian&logoColor=d3869b)](https://obsidian.md/)
-[![Scapple](https://img.shields.io/badge/Scapple-1d2021?style=flat-square&logo=apple&logoColor=fabd2f)](https://www.literatureandlatte.com/scapple/overview)
-[![Scrivener](https://img.shields.io/badge/Scrivener-1d2021?style=flat-square&logo=apple&logoColor=8ec07c)](https://www.literatureandlatte.com/scrivener/overview)
-[![Typora](https://img.shields.io/badge/Typora-1d2021?style=flat-square&logo=markdown&logoColor=83a598)](https://typora.io/)
-
-### 🌎 Browsers
-
-[![Firefox](https://img.shields.io/badge/Firefox-1d2021?style=flat-square&logo=firefox&logoColor=fe8019)](https://www.mozilla.org/firefox/)
-[![Firefox Dev](https://img.shields.io/badge/Firefox_Dev-1d2021?style=flat-square&logo=firefoxbrowser&logoColor=83a598)](https://www.mozilla.org/firefox/developer/)
-[![Chrome](https://img.shields.io/badge/Chrome-1d2021?style=flat-square&logo=googlechrome&logoColor=fabd2f)](https://www.google.com/chrome/)
-[![Edge](https://img.shields.io/badge/Edge-1d2021?style=flat-square&logo=microsoftedge&logoColor=83a598)](https://www.microsoft.com/edge)
-[![Zen](https://img.shields.io/badge/Zen-1d2021?style=flat-square&logo=zedindustries&logoColor=8ec07c)](https://zen-browser.app/)
-
-### 💬 AI, Communication & Corp
-
-[![Claude](https://img.shields.io/badge/Claude-1d2021?style=flat-square&logo=anthropic&logoColor=d3869b)](https://claude.ai/)
-[![Outlook](https://img.shields.io/badge/Outlook-1d2021?style=flat-square&logo=microsoftoutlook&logoColor=83a598)](https://www.microsoft.com/microsoft-365/outlook)
-[![Teams](https://img.shields.io/badge/Teams-1d2021?style=flat-square&logo=microsoftteams&logoColor=83a598)](https://www.microsoft.com/microsoft-teams)
-[![Slack](https://img.shields.io/badge/Slack-1d2021?style=flat-square&logo=slack&logoColor=8ec07c)](https://slack.com/)
-[![Zoom](https://img.shields.io/badge/Zoom-1d2021?style=flat-square&logo=zoom&logoColor=83a598)](https://zoom.us/)
-
-[![Excel](https://img.shields.io/badge/Excel-1d2021?style=flat-square&logo=microsoftexcel&logoColor=b8bb26)](https://www.microsoft.com/microsoft-365/excel)
-[![OneNote](https://img.shields.io/badge/OneNote-1d2021?style=flat-square&logo=microsoftonenote&logoColor=d3869b)](https://www.microsoft.com/microsoft-365/onenote)
-[![PowerPoint](https://img.shields.io/badge/PowerPoint-1d2021?style=flat-square&logo=microsoftpowerpoint&logoColor=fe8019)](https://www.microsoft.com/microsoft-365/powerpoint)
-[![Word](https://img.shields.io/badge/Word-1d2021?style=flat-square&logo=microsoftword&logoColor=83a598)](https://www.microsoft.com/microsoft-365/word)
-[![OneDrive](https://img.shields.io/badge/OneDrive-1d2021?style=flat-square&logo=microsoftonedrive&logoColor=83a598)](https://www.microsoft.com/microsoft-365/onedrive)
-
-### 🔒 Security & Privacy
-
-[![Proton Drive](https://img.shields.io/badge/Proton_Drive-1d2021?style=flat-square&logo=proton&logoColor=d3869b)](https://proton.me/drive)
-[![Proton Mail](https://img.shields.io/badge/Proton_Mail-1d2021?style=flat-square&logo=protonmail&logoColor=d3869b)](https://proton.me/mail)
-[![ProtonVPN](https://img.shields.io/badge/ProtonVPN-1d2021?style=flat-square&logo=protonvpn&logoColor=b8bb26)](https://protonvpn.com/)
-
----
-
-## 🤓 CLI Tools
-
-[![AWS CLI](https://img.shields.io/badge/awscli-1d2021?style=flat-square&logo=amazonaws&logoColor=fe8019)](https://aws.amazon.com/cli/)
-[![Bash](https://img.shields.io/badge/bash-1d2021?style=flat-square&logo=gnubash&logoColor=b8bb26)](https://www.gnu.org/software/bash/)
-[![bat](https://img.shields.io/badge/bat-1d2021?style=flat-square&logo=github&logoColor=fabd2f)](https://github.com/sharkdp/bat)
-[![fd](https://img.shields.io/badge/fd-1d2021?style=flat-square&logo=github&logoColor=8ec07c)](https://github.com/sharkdp/fd)
-[![Fish](https://img.shields.io/badge/fish-1d2021?style=flat-square&logo=fish&logoColor=fb4934)](https://fishshell.com/)
-[![fzf](https://img.shields.io/badge/fzf-1d2021?style=flat-square&logo=github&logoColor=d3869b)](https://github.com/junegunn/fzf)
-[![GitHub CLI](https://img.shields.io/badge/gh-1d2021?style=flat-square&logo=github&logoColor=ebdbb2)](https://cli.github.com/)
-[![Git](https://img.shields.io/badge/git-1d2021?style=flat-square&logo=git&logoColor=fe8019)](https://git-scm.com/)
-[![Go](https://img.shields.io/badge/go-1d2021?style=flat-square&logo=go&logoColor=83a598)](https://go.dev/)
-[![LazyGit](https://img.shields.io/badge/lazygit-1d2021?style=flat-square&logo=git&logoColor=8ec07c)](https://github.com/jesseduffield/lazygit)
-[![lsd](https://img.shields.io/badge/lsd-1d2021?style=flat-square&logo=github&logoColor=fabd2f)](https://github.com/lsd-rs/lsd)
-[![neofetch](https://img.shields.io/badge/neofetch-1d2021?style=flat-square&logo=github&logoColor=d3869b)](https://github.com/dylanaraps/neofetch)
-[![Neovim](https://img.shields.io/badge/neovim-1d2021?style=flat-square&logo=neovim&logoColor=b8bb26)](https://neovim.io/)
-[![nvm](https://img.shields.io/badge/nvm-1d2021?style=flat-square&logo=nodedotjs&logoColor=b8bb26)](https://github.com/nvm-sh/nvm)
-[![ripgrep](https://img.shields.io/badge/ripgrep-1d2021?style=flat-square&logo=github&logoColor=8ec07c)](https://github.com/BurntSushi/ripgrep)
-[![Starship](https://img.shields.io/badge/starship-1d2021?style=flat-square&logo=starship&logoColor=fabd2f)](https://starship.rs/)
-[![Terraform](https://img.shields.io/badge/terraform-1d2021?style=flat-square&logo=terraform&logoColor=d3869b)](https://www.terraform.io/)
-[![tmux](https://img.shields.io/badge/tmux-1d2021?style=flat-square&logo=tmux&logoColor=b8bb26)](https://github.com/tmux/tmux)
-[![tree](https://img.shields.io/badge/tree-1d2021?style=flat-square&logo=gnubash&logoColor=8ec07c)](https://linux.die.net/man/1/tree)
-[![Yazi](https://img.shields.io/badge/yazi-1d2021?style=flat-square&logo=github&logoColor=fabd2f)](https://yazi-rs.github.io/)
-[![yamllint](https://img.shields.io/badge/yamllint-1d2021?style=flat-square&logo=yaml&logoColor=fb4934)](https://github.com/adrienverge/yamllint)
-[![Zellij](https://img.shields.io/badge/zellij-1d2021?style=flat-square&logo=github&logoColor=fe8019)](https://zellij.dev/)
-[![zoxide](https://img.shields.io/badge/zoxide-1d2021?style=flat-square&logo=github&logoColor=fabd2f)](https://github.com/ajeetdsouza/zoxide)
-[![Zsh](https://img.shields.io/badge/zsh-1d2021?style=flat-square&logo=zsh&logoColor=b8bb26)](https://www.zsh.org/)
-
----
-
-## ⌨️ Hardware & Other
-
-[![Kinesis 360](https://img.shields.io/badge/Kinesis_Advantage_360-1d2021?style=flat-square&logo=kinesis&logoColor=8ec07c)](https://kinesis-ergo.com/keyboards/advantage360/)
-[![Bambu Lab](https://img.shields.io/badge/Bambu_P2S-1d2021?style=flat-square&logo=bambulab&logoColor=b8bb26)](https://bambulab.com/)
-[![Raspberry Pi](https://img.shields.io/badge/Raspberry_Pi-1d2021?style=flat-square&logo=raspberrypi&logoColor=fb4934)](https://www.raspberrypi.com/software/)
-[![Shure MV7+](https://img.shields.io/badge/Shure_MV7+-1d2021?style=flat-square&logo=shure&logoColor=ebdbb2)](https://www.shure.com/en-US/microphones/mv7)
-[![Spotify](https://img.shields.io/badge/Spotify-1d2021?style=flat-square&logo=spotify&logoColor=b8bb26)](https://www.spotify.com/)
-
----
-
-<div align="center">
-
-<img src="./images/keyboard.png" alt="Kinesis Advantage 360" width="600" />
-
-_Built with ☕_
-
-</div>
+Tests modify only temporary homes. Python 3.11+ additionally validates TOML with the standard library. They cover fresh install, rerun idempotence, backups, private overrides, Git signing/identity migration, symlink handling, path escaping, source preflight, and the exact PARA layout. A complete fresh-Mac software installation still requires testing on a disposable Mac/VM and accepting app-specific prompts.

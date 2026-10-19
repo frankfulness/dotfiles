@@ -4,6 +4,7 @@
 | Key          | Action                                    |
 |--------------|-------------------------------------------|
 | `<leader>e`  | Toggle file explorer                      |
+| `/`          | Filter/search files in tree               |
 | `a`          | Create new file/folder (add `/` for folder) |
 | `r`          | Rename file/folder                        |
 | `d`          | Delete file/folder                        |
@@ -14,6 +15,8 @@
 | `<Space>`    | Preview file                              |
 | `H`          | Show hidden files                         |
 | `R`          | Refresh tree                              |
+| `<C-w>h`     | Focus tree (from editor)                  |
+| `<C-w>l`     | Focus editor (from tree)                  |
 
 ## Navigation & Movement
 | Key          | Action                                    |
@@ -78,6 +81,7 @@
 ## Quick Actions
 | Key          | Action                                    |
 |--------------|-------------------------------------------|
+| `<Home>`     | Return to dashboard/home screen           |
 | `<leader><leader>` | Find files                          |
 | `<leader>:`  | Command history                           |
 | `<leader>qq` | Quit all                                  |

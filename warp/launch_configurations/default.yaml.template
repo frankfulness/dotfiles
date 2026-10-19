@@ -1,0 +1,8 @@
+---
+name: Workspace
+windows:
+  - tabs:
+      - layout:
+          cwd: "@HOME@"
+      - layout:
+          cwd: "@HOME@"

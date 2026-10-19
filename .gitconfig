@@ -1,8 +1,21 @@
-[user]
-	name = Frankfulness
-	email = Fullstackfrank@gmail.com
-	signingkey = B774CC49DD110EDE
-[commit]
-	gpgsign = true
-[tag]
-	gpgsign = true
+# Identity and signing settings are private and machine-local.
+[init]
+    defaultBranch = main
+[core]
+    editor = code --wait
+    excludesfile = ~/.config/git/ignore
+[pull]
+    ff = only
+[fetch]
+    prune = true
+[push]
+    autoSetupRemote = true
+[credential]
+    helper = osxkeychain
+[filter "lfs"]
+    clean = git-lfs clean -- %f
+    smudge = git-lfs smudge -- %f
+    process = git-lfs filter-process
+    required = true
+[include]
+    path = ~/.gitconfig.local

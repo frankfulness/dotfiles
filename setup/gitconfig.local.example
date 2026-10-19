@@ -1,0 +1,24 @@
+# Copy to ~/.gitconfig.local, NOT to a tracked file.
+[user]
+    name = Your Name
+    email = your-chosen-public-or-GitHub-noreply-address@example.com
+
+# Enable signing only after generating/importing a key on this Mac.
+# Public fingerprints/public SSH keys are not secrets. Private keys ARE.
+# For GPG signing:
+# [user]
+#     signingkey = YOUR_PUBLIC_KEY_FINGERPRINT
+# [commit]
+#     gpgsign = true
+# [tag]
+#     gpgsign = true
+#
+# For SSH signing instead:
+# [gpg]
+#     format = ssh
+# [user]
+#     signingkey = ~/.ssh/id_ed25519.pub
+# [commit]
+#     gpgsign = true
+# [tag]
+#     gpgsign = true

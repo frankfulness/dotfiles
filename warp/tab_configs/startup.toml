@@ -1,0 +1,8 @@
+name = "Start"
+
+[[panes]]
+id = "main"
+type = "agent"
+directory = "~/Desktop/PARA"
+
+[params]

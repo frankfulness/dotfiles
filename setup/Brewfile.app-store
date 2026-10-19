@@ -1,0 +1,5 @@
+# Requires App Store sign-in and prior purchase with that Apple Account.
+brew "mas"
+mas "Dato", id: 1470584107
+mas "Cursor Pro", id: 1447043133
+mas "Keystroke Pro", id: 1572206224

@@ -1,0 +1,6 @@
+name = "Terminal"
+
+[[panes]]
+id = "main"
+type = "terminal"
+commands = []

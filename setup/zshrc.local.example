@@ -1,0 +1,3 @@
+# Copy to ~/.zshrc.local. Never commit the populated file.
+# Put private aliases, internal endpoints, and local integrations here.
+# Prefer macOS Keychain / a password manager for credentials.
