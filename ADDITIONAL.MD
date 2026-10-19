@@ -17,18 +17,23 @@ The installer must run as your normal user, **not** with `sudo`. Homebrew or ind
 
 ### Installation order
 
-1. Apple Command Line Tools and architecture-appropriate Homebrew.
-2. Curated applications, Git/tools, and fonts from `Brewfile`.
-3. Oh My Zsh, upstream NVM (pinned to v0.40.8 for a new install), and the current Node LTS. Existing NVM installs are reused, not overwritten; Node's default becomes `lts/*`.
-4. Copy reviewed configs, preserve private Git settings, and create the PARA folders.
-5. Install the reviewed VS Code extensions from `vscode/extensions.txt`.
-6. Optionally restore purchased App Store apps.
+1. Immediately copy `.zshrc`, `.zprofile`, and Starship settings into your home, backing up prior files, and create Desktop PARA. This phase needs neither Python nor Homebrew.
+2. Set up Apple Command Line Tools and architecture-appropriate Homebrew.
+3. Install the CLI tools from `setup/Brewfile.shell`, then Oh My Zsh, upstream NVM (pinned to v0.40.8 for a new install), and current Node LTS. Existing NVM installs are reused; Node's default becomes `lts/*`.
+4. Restore Warp settings, keybindings, theme, and background first, then install missing Warp/fonts using `setup/Brewfile.warp`.
+5. If requested, trust/install the exact desktop dependencies. Then install other GUI applications from `setup/Brewfile.apps` (skipped by `--desktop-only`).
+6. Restore remaining Git/editor/optional desktop configs, start requested desktop services, and install VS Code extensions.
+7. Optionally restore purchased App Store apps.
 
-Homebrew comes before the apps because it installs them. Setup does not remove applications, clean Homebrew packages, start background services, import credentials, or silently grant permissions. Existing Homebrew packages are not upgraded by this bootstrap. It does not install Homebrew Node, Powerlevel10k, extra terminals, window managers, or the legacy repository's entire tool collection.
+A script launched with `./install.sh` cannot source Zsh config into its parent terminal. The first phase makes it available immediately to new Zsh terminals; after setup, run `source ~/.zshrc` or `exec zsh -l` in the original terminal. Missing optional tools are guarded, so the early shell can load before downloads finish. Shell shortcuts requiring those tools become available once the tools are installed and the shell is reloaded.
+
+The root `Brewfile` remains an aggregate of the shell, Warp, and other-app manifests for direct `brew bundle` use. Only `install.sh` guarantees the early shell/PARA copies and phased configuration ordering.
+
+Homebrew comes before the apps because it installs them. The default setup does not remove applications, clean Homebrew packages, start background services, import credentials, or silently grant permissions. Existing Homebrew packages are not upgraded by this bootstrap. It does not install Homebrew Node, Powerlevel10k, extra terminals, or the legacy repository's entire tool collection. Desktop tools/services are opt-in as described below.
 
 GUI apps already present in `/Applications` or `~/Applications` are skipped with a visible message, even if installed manually rather than through Homebrew. They are not downloaded, adopted, upgraded, or replaced by these app entries. Existing app symlinks (including broken ones) are also left alone for manual review. Apps stored elsewhere or renamed are not detected by these checks. This applies to the optional App Store apps too. Fonts still use Homebrew's installed-package checks; Homebrew may update dependencies needed by a newly installed package despite `--no-upgrade`.
 
-This app protection does **not** disable configuration restoration: step 4 still backs up and replaces differing managed config files, and step 5 installs the configured VS Code extensions.
+This app protection does **not** disable configuration restoration: the shell/Warp/remaining configuration phases still back up and replace differing managed config files, and the editor stage installs the configured VS Code extensions.
 
 ### Options
 
@@ -37,6 +42,10 @@ This app protection does **not** disable configuration restoration: step 4 still
 - `./install.sh --app-store`: full setup plus purchased App Store apps.
 - `./install.sh --non-interactive`: skip Git identity prompts; configure identity separately.
 - `./install.sh --skip-extensions`: omit VS Code extension installation.
+- `./install.sh --desktop`: full setup plus AeroSpace, SketchyBar, and JankyBorders.
+- `./install.sh --desktop-only`: skip the main GUI app bundle and VS Code extension stage; install shell/desktop dependencies, set up Oh My Zsh/NVM/Node LTS, copy base and desktop configs, then start desktop services.
+- `./install.sh --config-only --desktop`: copy base and desktop configs without installing tools or starting services.
+- `./install.sh --desktop-only --no-start`: install tools and copy configs, but defer service startup.
 
 Options can be combined. Rerun after fixing a failed step; identical config files are left unchanged. This is a resumable bootstrap, not a transactional system image or version-locked package snapshot. Never use `brew bundle dump --force` to replace the curated Brewfile with every app on a machine.
 
@@ -61,6 +70,8 @@ Files are **copied**, not symlinked. Editing a live config cannot accidentally e
 ## Warp
 
 `warp/` captures the current portable settings, custom keybindings, custom theme, and its full-resolution background image. Text/EXIF metadata is stripped from the PNG without changing its pixel data. `font-0xproto-nerd-font` and Hack are installed to match the terminal/AI fonts. The custom theme's absolute path is rendered for the new user's home at install time.
+
+The portable settings explicitly disable agent attribution using `agents.warp_agent.other.agent_attribution_enabled = false`.
 
 The existing single terminal tab, agent startup tab, and two-tab launch layout are represented without personal machine paths. The startup tab opens `~/Desktop/PARA`. Settings include the current appearance, native prompt selection, agent permissions/denylist, privacy/redaction rules, notifications, and settings-sync preference. Settings Sync can subsequently reconcile these with your signed-in account.
 
@@ -109,12 +120,27 @@ git diff --check
 
 The checker reports locations, never secret values. It detects common credential formats, literal credential assignments, and machine-specific home paths; it is not a comprehensive secret scanner or a guarantee of safety. Use an independent scanner such as Gitleaks as an additional check. Ignore rules do not protect secrets in already-tracked files. If a real credential ever entered public history, revoke/rotate it; deleting its current line does not erase the old commits.
 
-Legacy Neovim/window-manager/terminal configs are retained for reference but are not installed by default.
+Legacy Neovim and extra-terminal configs are retained for reference but are not installed by default.
+
+## Shell and desktop setup after cloning
+
+From the cloned repo on the new Mac, run `./install.sh --desktop-only`, then `exec zsh -l` (or open a new terminal). Preview with `./install.sh --desktop-only --dry-run`. This copies the repo-root `.zshrc` to `~/.zshrc`, along with the existing base configuration set (including Warp, Git, VS Code preferences, and PARA directories). It does not source private machine-specific helpers from the public repository.
+
+The desktop profile installs the shell tools, `jq`, `felixkratz/formulae/sketchybar`, `felixkratz/formulae/borders`, and `nikitabobko/tap/aerospace`. On Homebrew versions with tap trust, setup first taps the two upstream repositories, then explicitly trusts only the SketchyBar and borders formulas and the AeroSpace cask when installing it. Trust is followed by the actual package installation through `brew bundle install --verbose --no-upgrade`; trust alone does not install anything. It does not trust entire taps, disable trust checks, use `--adopt`, or bypass Gatekeeper.
+
+Existing AeroSpace app bundles are left untouched. A manually installed AeroSpace also needs its separate `aerospace` CLI on PATH; if missing, setup reports this instead of replacing the app. Install that CLI from the official release into `~/.local/bin`.
+
+Config copies go into `~/.config/aerospace`, `~/.config/sketchybar`, and `~/.config/borders`. Scripts retain executable permissions, backup/example files are excluded, and the repo's matching app-icon font is installed into `~/Library/Fonts`. An existing 0xProto Nerd Font file causes the font cask to be skipped to avoid manual-install collisions; if only some styles are installed, complete that font installation separately. An existing `~/.aerospace.toml` is moved into the private backup directory to avoid AeroSpace's conflicting-config-locations error. Desktop-directory symlinks are backed up and replaced with real directories rather than modifying an old checkout.
+
+Once configs are copied, setup opens/reloads AeroSpace and restarts the user-level Homebrew borders/SketchyBar services (which run at future logins). To retry startup without reinstalling or copying anything, run `bash setup/start-desktop.sh`. AeroSpace is configured to start at login.
+
+macOS still requires you to approve AeroSpace's Accessibility access and any requested Automation/Screen Recording permissions. To avoid two menu bars, set the macOS menu bar to automatically hide. The setup does not change system display/Spaces preferences, unload macOS services, remove quarantine flags, or grant permissions automatically. JankyBorders requires macOS 14 or newer. Desktop appearance, multi-monitor behavior, and actual permissions need verification on the new Mac.
 
 ## Offline validation
 
 ```sh
 python3 setup/test_setup.py
+python3 -m unittest discover -s setup -p 'test_*.py'
 python3 setup/check-public.py --history
 bash -n install.sh
 bash -n setup/bootstrap.sh

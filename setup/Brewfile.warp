@@ -1,0 +1,25 @@
+# Terminal appearance is set up before the rest of the GUI app bundle.
+font_dirs = [File.expand_path("~/Library/Fonts"), "/Library/Fonts"]
+proto_names = [
+  "0xProtoNerdFontMono-Regular.ttf", "0xProtoNerdFontMono-Bold.ttf",
+  "0xProtoNerdFontMono-Italic.ttf", "0xProtoNerdFont-Regular.ttf",
+  "0xProtoNerdFont-Bold.ttf", "0xProtoNerdFont-Italic.ttf",
+  "0xProtoNerdFontPropo-Regular.ttf", "0xProtoNerdFontPropo-Bold.ttf",
+  "0xProtoNerdFontPropo-Italic.ttf",
+]
+if font_dirs.any? { |dir| proto_names.any? { |name| File.exist?(File.join(dir, name)) || File.symlink?(File.join(dir, name)) } }
+  puts "Skipping 0xProto Nerd Font: existing font files left untouched."
+else
+  cask "font-0xproto-nerd-font"
+end
+if font_dirs.any? { |dir| File.exist?(File.join(dir, "Hack-Regular.ttf")) || File.symlink?(File.join(dir, "Hack-Regular.ttf")) }
+  puts "Skipping Hack: existing font files left untouched."
+else
+  cask "font-hack"
+end
+apps = ["/Applications/Warp.app", File.expand_path("~/Applications/Warp.app")]
+if apps.any? { |path| File.exist?(path) || File.symlink?(path) }
+  puts "Skipping Warp: app already present; leaving it untouched."
+else
+  cask "warp"
+end

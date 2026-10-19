@@ -7,6 +7,9 @@ CONFIG_ONLY=0
 APP_STORE=0
 INTERACTIVE=1
 EXTENSIONS=1
+DESKTOP=0
+DESKTOP_ONLY=0
+START_DESKTOP=1
 
 usage() {
     printf '%s\n' "Usage: ./install.sh [options]" \
@@ -15,6 +18,9 @@ usage() {
         "  --app-store        Also restore the three purchased App Store apps" \
         "  --non-interactive  Skip Git identity prompts" \
         "  --skip-extensions  Skip VS Code extension installation" \
+        "  --desktop          Also install/configure AeroSpace, SketchyBar, and JankyBorders" \
+        "  --desktop-only     Set up shell, desktop, and configs; skip the main GUI app bundle" \
+        "  --no-start         Copy desktop configs without starting desktop services" \
         "  --help             Show this help"
 }
 for arg in "$@"; do
@@ -24,12 +30,32 @@ for arg in "$@"; do
         --app-store) APP_STORE=1 ;;
         --non-interactive) INTERACTIVE=0 ;;
         --skip-extensions) EXTENSIONS=0 ;;
+        --desktop) DESKTOP=1 ;;
+        --desktop-only) DESKTOP=1; DESKTOP_ONLY=1; EXTENSIONS=0 ;;
+        --no-start) START_DESKTOP=0 ;;
         --help|-h) usage; exit 0 ;;
         *) printf 'Unknown option: %s\n' "$arg" >&2; usage >&2; exit 2 ;;
     esac
 done
 [ "$(uname -s)" = Darwin ] || { printf 'macOS only.\n' >&2; exit 1; }
 [ "$(id -u)" -ne 0 ] || { printf 'Run as your normal user, not sudo.\n' >&2; exit 1; }
+
+install_desktop_dependencies() {
+    run brew tap felixkratz/formulae
+    run brew tap nikitabobko/tap
+    if [ "$DRY_RUN" -eq 1 ] || brew help trust >/dev/null 2>&1; then
+        printf 'Trusting only the exact upstream desktop packages, not entire taps.\n'
+        run brew trust --formula felixkratz/formulae/sketchybar
+        run brew trust --formula felixkratz/formulae/borders
+        if [ ! -e /Applications/AeroSpace.app ] && [ ! -L /Applications/AeroSpace.app ] &&
+           [ ! -e "$HOME/Applications/AeroSpace.app" ] && [ ! -L "$HOME/Applications/AeroSpace.app" ]; then
+            run brew trust --cask nikitabobko/tap/aerospace
+        fi
+    else
+        printf 'This Homebrew version has no trust command; using its normal install behavior.\n'
+    fi
+    run brew bundle install --verbose --no-upgrade --file="$ROOT/setup/Brewfile.desktop"
+}
 
 run() {
     if [ "$DRY_RUN" -eq 1 ]; then
@@ -41,8 +67,15 @@ run() {
     fi
 }
 
+printf '\n1. Shell configuration and Desktop PARA (before downloads)\n'
+if [ "$DRY_RUN" -eq 1 ]; then
+    /bin/bash "$ROOT/setup/early-shell.sh" --dry-run
+else
+    /bin/bash "$ROOT/setup/early-shell.sh"
+fi
+
 if [ "$CONFIG_ONLY" -eq 0 ]; then
-    printf '\n1. Apple Command Line Tools and Homebrew\n'
+    printf '\n2. Apple Command Line Tools and Homebrew\n'
     if [ "$DRY_RUN" -eq 0 ] && ! xcode-select -p >/dev/null 2>&1; then
         xcode-select --install
         printf 'Finish the Apple installer, then rerun ./install.sh.\n'
@@ -73,10 +106,9 @@ if [ "$CONFIG_ONLY" -eq 0 ]; then
             fi
         fi
     fi
-    printf '\n2. Curated applications, fonts, and shell tools\n'
-    printf 'Existing apps in /Applications or ~/Applications are skipped, not adopted or replaced.\n'
-    run brew bundle install --verbose --no-upgrade --file="$ROOT/Brewfile"
-    printf '\n3. Oh My Zsh, upstream NVM, and Node LTS\n'
+    printf '\n3. Homebrew shell tools (no GUI apps yet)\n'
+    run brew bundle install --verbose --no-upgrade --file="$ROOT/setup/Brewfile.shell"
+    printf '\n3b. Oh My Zsh, upstream NVM, and Node LTS\n'
     if [ ! -e "$HOME/.oh-my-zsh" ]; then
         run git clone --depth=1 https://github.com/ohmyzsh/ohmyzsh.git "$HOME/.oh-my-zsh"
     fi
@@ -100,20 +132,48 @@ if [ "$CONFIG_ONLY" -eq 0 ]; then
     fi
 fi
 
-printf '\n4. Portable settings, private Git identity, and PARA folders\n'
 configure_args=()
 [ "$DRY_RUN" -eq 0 ] || configure_args+=(--dry-run)
 [ "$INTERACTIVE" -eq 1 ] || configure_args+=(--non-interactive)
-if command -v python3 >/dev/null 2>&1; then
-    python3 "$ROOT/setup/configure.py" ${configure_args[@]+"${configure_args[@]}"}
-elif [ "$DRY_RUN" -eq 1 ]; then
-    printf '[dry-run] Python 3 (installed in step 2) will deploy configuration.\n'
-else
-    printf 'Python 3 is required. Run the full installer first.\n' >&2
-    exit 1
+[ "$DESKTOP" -eq 0 ] || configure_args+=(--desktop)
+configure_phase() {
+    if command -v python3 >/dev/null 2>&1; then
+        python3 -B "$ROOT/setup/configure.py" --phase "$1" ${configure_args[@]+"${configure_args[@]}"}
+    elif [ "$DRY_RUN" -eq 1 ]; then
+        printf '[dry-run] Python 3 from the shell-tool phase will restore %s settings.\n' "$1"
+    else
+        printf 'Python 3 is required for app configs. Shell files and PARA are already in place.\n' >&2
+        exit 1
+    fi
+}
+
+printf '\n4. Warp customization (before other applications)\n'
+configure_phase warp
+if [ "$CONFIG_ONLY" -eq 0 ]; then
+    run brew bundle install --verbose --no-upgrade --file="$ROOT/setup/Brewfile.warp"
+fi
+
+if [ "$DESKTOP" -eq 1 ] && [ "$CONFIG_ONLY" -eq 0 ]; then
+    printf '\n5. Desktop dependencies: AeroSpace, SketchyBar, and JankyBorders\n'
+    install_desktop_dependencies
+fi
+if [ "$CONFIG_ONLY" -eq 0 ] && [ "$DESKTOP_ONLY" -eq 0 ]; then
+    printf '\n6. Other GUI applications (existing apps are skipped)\n'
+    run brew bundle install --verbose --no-upgrade --file="$ROOT/setup/Brewfile.apps"
+fi
+
+printf '\n7. Remaining Git, editor, and optional desktop configuration\n'
+configure_phase remaining
+if [ "$DESKTOP" -eq 1 ] && [ "$CONFIG_ONLY" -eq 0 ] && [ "$START_DESKTOP" -eq 1 ]; then
+    printf '\nStart/reload AeroSpace, JankyBorders, and SketchyBar\n'
+    if [ "$DRY_RUN" -eq 1 ]; then
+        /bin/bash "$ROOT/setup/start-desktop.sh" --dry-run
+    else
+        /bin/bash "$ROOT/setup/start-desktop.sh"
+    fi
 fi
 if [ "$CONFIG_ONLY" -eq 0 ] && [ "$EXTENSIONS" -eq 1 ]; then
-    printf '\n5. VS Code extensions\n'
+    printf '\n8. VS Code extensions\n'
     code_bin="/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code"
     if [ ! -x "$code_bin" ] && [ -x "$HOME/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code" ]; then
         code_bin="$HOME/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code"
@@ -127,8 +187,8 @@ if [ "$CONFIG_ONLY" -eq 0 ] && [ "$EXTENSIONS" -eq 1 ]; then
         run "$code_bin" --install-extension "$extension"
     done < "$ROOT/vscode/extensions.txt"
 fi
-if [ "$CONFIG_ONLY" -eq 0 ] && [ "$APP_STORE" -eq 1 ]; then
-    printf '\n6. Purchased App Store apps (sign in to the App Store first)\n'
+if [ "$CONFIG_ONLY" -eq 0 ] && [ "$DESKTOP_ONLY" -eq 0 ] && [ "$APP_STORE" -eq 1 ]; then
+    printf '\n9. Purchased App Store apps (sign in to the App Store first)\n'
     run brew bundle install --verbose --no-upgrade --file="$ROOT/setup/Brewfile.app-store"
 fi
 printf '\nSetup phases complete. Remaining interactive steps:\n'
@@ -139,3 +199,4 @@ printf '%s\n' \
     "- Restore App Store apps with ./install.sh --app-store if needed." \
     "- Provision a Git signing key locally; see setup/gitconfig.local.example." \
     "- Restart the terminal. See README.md for private overrides and backups."
+printf '%s\n' 'To use the copied ~/.zshrc immediately, open a new terminal or run: exec zsh -l'

@@ -1,0 +1,21 @@
+# General GUI apps run only after the shell and Warp are configured.
+app_present = lambda do |name|
+  paths = ["/Applications/#{name}.app", File.expand_path("~/Applications/#{name}.app")]
+  present = paths.any? { |path| File.exist?(path) || File.symlink?(path) }
+  puts "Skipping #{name}: app already present; leaving it untouched." if present
+  present
+end
+cask "claude" unless app_present.call("Claude")
+cask "docker-desktop" unless app_present.call("Docker")
+cask "figma" unless app_present.call("Figma")
+cask "slack" unless app_present.call("Slack")
+cask "zoom" unless app_present.call("zoom.us")
+cask "obsidian" unless app_present.call("Obsidian")
+cask "google-chrome" unless app_present.call("Google Chrome")
+cask "visual-studio-code" unless app_present.call("Visual Studio Code")
+cask "bruno" unless app_present.call("Bruno")
+cask "clipy" unless app_present.call("Clipy")
+cask "screen-studio" unless app_present.call("Screen Studio")
+cask "raycast" unless app_present.call("Raycast")
+cask "affinity" unless app_present.call("Affinity")
+cask "spotify" unless app_present.call("Spotify")

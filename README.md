@@ -40,13 +40,22 @@ cd ~/.config/dotfiles
 ./install.sh
 ```
 
+**Shell + desktop setup** (also works after installing the apps separately):
+
+```bash
+./install.sh --desktop-only
+exec zsh -l
+```
+
+Copies `.zshrc` to your home directory, restores the base configs, and installs/configures AeroSpace, SketchyBar, and JankyBorders. Existing configs are backed up first. Approve AeroSpace's Accessibility prompt when asked.
+
 <details>
 <summary>📦 What the script does</summary>
 
-1. Install Homebrew and the curated apps/tools.
-2. Set up Oh My Zsh, NVM, and Node LTS.
-3. Back up existing configs and copy shell, Git, Warp, and VSCode settings.
-4. Install VSCode extensions and create the Desktop PARA folders.
+1. Copy shell configs and create Desktop PARA immediately, backing up prior files.
+2. Install Homebrew, shell tools, Oh My Zsh, NVM, and Node LTS.
+3. Restore Warp customization before installing the other apps.
+4. Restore Git/VSCode settings and extensions, plus desktop tools if requested.
 
 </details>
 

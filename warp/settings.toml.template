@@ -72,6 +72,7 @@ show_model_selectors_in_prompt = true
 nld_in_terminal_enabled = true
 
 [agents.warp_agent.other]
+agent_attribution_enabled = false
 cloud_agent_computer_use_enabled = true
 
 [agents.third_party]

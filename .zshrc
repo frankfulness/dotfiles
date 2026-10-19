@@ -76,6 +76,14 @@ if command -v claude >/dev/null 2>&1; then
     alias ccr='claude --resume'
 fi
 
+if command -v aerospace >/dev/null 2>&1; then
+    alias asw='aerospace list-windows --all'
+    alias asreload='aerospace reload-config'
+fi
+if command -v sketchybar >/dev/null 2>&1; then
+    alias rsa='sketchybar --reload'
+fi
+
 if command -v fd >/dev/null 2>&1; then
     export FZF_DEFAULT_COMMAND='fd --hidden --strip-cwd-prefix --exclude .git'
     export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"

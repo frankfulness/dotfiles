@@ -1,0 +1,15 @@
+# Shell tools and Warp/fonts are installed earlier by install.sh.
+tap "felixkratz/formulae"
+tap "nikitabobko/tap"
+brew "jq"
+brew "felixkratz/formulae/sketchybar"
+brew "felixkratz/formulae/borders"
+
+apps = ["/Applications/AeroSpace.app", File.expand_path("~/Applications/AeroSpace.app")]
+if apps.any? { |path| File.exist?(path) || File.symlink?(path) }
+  puts "Skipping AeroSpace: app already present; leaving it untouched."
+else
+  cask "nikitabobko/tap/aerospace"
+end
+
+# The matching app-icon font is copied from the repo with its icon map.

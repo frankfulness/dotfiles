@@ -31,7 +31,7 @@ require "json"
     original.call(fixture)
   end
 end
-entries = {"brew" => [], "cask" => [], "mas" => []}
+entries = {"brew" => [], "cask" => [], "mas" => [], "tap" => []}
 context = Object.new
 entries.each_key do |kind|
   context.define_singleton_method(kind) { |name, *options| entries[kind] << name }

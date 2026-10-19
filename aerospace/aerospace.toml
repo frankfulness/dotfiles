@@ -136,3 +136,7 @@ run = 'layout floating'
 # Catch-all: refresh sketchybar icons whenever any new window appears
 [[on-window-detected]]
 run = 'exec-and-forget sleep 0.3 && sketchybar --trigger aerospace_workspace_change'
+
+# GUI apps do not read ~/.zshrc; expose Homebrew to the SketchyBar callbacks.
+[exec.env-vars]
+PATH = '/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/usr/local/sbin:${PATH}'
